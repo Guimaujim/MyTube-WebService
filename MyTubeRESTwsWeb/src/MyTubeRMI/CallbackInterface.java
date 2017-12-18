@@ -1,3 +1,5 @@
+package MyTubeRMI;
+
 import java.rmi.*;
 
 //Interface of the callback's implementation
