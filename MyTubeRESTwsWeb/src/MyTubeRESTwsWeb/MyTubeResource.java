@@ -87,7 +87,7 @@ public class MyTubeResource {
 		try {
 			Statement st = getStatement();
 			ResultSet rs = st.executeQuery("SELECT key, name, description, server_id FROM file "
-					+ "WHERE name ='" + name + "';");
+					+ "WHERE name LIKE'%" + name + "%';");
 			List<fileData> af = new ArrayList<>();
 			if(!rs.isBeforeFirst()){
 				return Response.status(404).entity("File not found").build();

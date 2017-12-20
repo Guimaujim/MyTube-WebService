@@ -5,6 +5,8 @@ import java.io.*;
 import java.util.List;
 import java.util.Vector;
 
+import classData.fileData;
+
 //Interface of the server's implementation
 public interface MyTubeInterface extends Remote {
 
@@ -14,7 +16,7 @@ public interface MyTubeInterface extends Remote {
     public String upload(byte[] file, String title, String server_id, String description)
             throws java.rmi.RemoteException;
 
-    public String find(String name, boolean repeat)
+    public fileData[] find(String name)
             throws java.rmi.RemoteException;
     
     public void delete(String key)

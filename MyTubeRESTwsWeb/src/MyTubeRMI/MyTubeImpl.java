@@ -106,7 +106,7 @@ public class MyTubeImpl extends UnicastRemoteObject implements MyTubeInterface {
             try {
                 String registryURL = "rmi://" + sd.getIp() + ":" + sd.getPort() + "/mytube/" + sd.getId();
 				MyTubeInterface i = (MyTubeInterface) Naming.lookup(registryURL);
-				return download(name, c);
+				return i.download(name, c);
 			} catch (MalformedURLException e) {
 				e.printStackTrace();
 			} catch (NotBoundException e) {
@@ -135,21 +135,19 @@ public class MyTubeImpl extends UnicastRemoteObject implements MyTubeInterface {
         return found;
     }
     
-    public void delete(String key) {
-        File folder = new File("Database");
-        String path = "Database";
-        File[] directory = folder.listFiles();
-        searchAndDelete(directory, path, key);
-
-        try {
-            for (int i = 0; i < MyTubeServers.size(); i++) {
-                MyTubeInterface server
-                        = (MyTubeInterface) MyTubeServers.elementAt(i);
-                server.searchAndDeleteInit(key);
-            }
-        } catch (Exception e) {
-            System.out.println("Error! " + e);
-        }
+    public void delete(String key) throws RemoteException {
+		fileData f = getFileByKey(key);
+		serverData sd = getServer(f.getServerId());
+		
+		try {
+	        String registryURL = "rmi://" + sd.getIp() + ":" + sd.getPort() + "/mytube/" + sd.getId();
+			MyTubeInterface i = (MyTubeInterface) Naming.lookup(registryURL);
+			i.searchAndDeleteInit(key);
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+		} catch (NotBoundException e) {
+			e.printStackTrace();
+		}
     }
 
     @Override
@@ -254,39 +252,8 @@ public class MyTubeImpl extends UnicastRemoteObject implements MyTubeInterface {
 
     //Auxiliary method for server find so it can be a recursive method
     @Override
-    public String find(String name, boolean repeat
-    ) {
-        File folder = new File("Database");
-        String path = "Database";
-        File[] directory = folder.listFiles();
-        String result = "";
-        ArrayList<String> StringArray = new ArrayList<String>();
-
-        StringArray = serverFind(directory, path, name);
-
-        for (int i = 0; i < StringArray.size(); i++) {
-            if (i != StringArray.size() - 1) {
-                result += StringArray.get(i) + " | ";
-            } else {
-                result += StringArray.get(i);
-            }
-        }
-        result += " ";
-
-        if (repeat == true) {
-            try {
-                for (int i = 0; i < MyTubeServers.size(); i++) {
-                    MyTubeInterface server
-                            = (MyTubeInterface) MyTubeServers.elementAt(i);
-                    result += server.find(name, false);
-                }
-            } catch (Exception e) {
-                System.out.println("Error! " + e);
-            }
-            return result;
-        }
-
-        return result;
+    public fileData[] find(String name) {	
+    	return getFileByName(name);
     }
 
     //Searches for files that contain the given name
@@ -354,6 +321,35 @@ public class MyTubeImpl extends UnicastRemoteObject implements MyTubeInterface {
 				af[i].setServerId(af[i].getServerId().trim());
 			}
 			return af;
+					
+		} catch (Exception e) { 
+			System.out.println(e);
+			return null;
+		}
+    }
+    
+    public fileData getFileByKey(String key){
+    	try {
+			URL url = new URL ("http://localhost:8080/MyTubeRESTwsWeb/rest/filek/" + key);
+			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+			conn.setRequestMethod("GET");
+			conn.setRequestProperty("Accept", MediaType.APPLICATION_JSON);
+			if(conn.getResponseCode() != 200){
+				System.out.println(conn.getResponseCode());
+				return null;
+			}
+			int i;
+			BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+			String output = br.readLine();
+			conn.disconnect();
+			
+			Gson g = new Gson();
+			fileData f = g.fromJson(output, fileData.class);
+			f.setKey(f.getKey().trim());
+			f.setName(f.getName().trim());
+			f.setDescription(f.getDescription().trim());
+			f.setServerId(f.getServerId().trim());
+			return f;
 					
 		} catch (Exception e) { 
 			System.out.println(e);

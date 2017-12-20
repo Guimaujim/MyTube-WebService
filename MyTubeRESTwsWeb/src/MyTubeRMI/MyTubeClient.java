@@ -5,6 +5,8 @@ import java.io.*;
 import java.net.InetAddress;
 import java.util.Scanner;
 
+import classData.fileData;
+
 public class MyTubeClient {
 
     public static void main(String args[]) throws java.net.UnknownHostException {
@@ -182,13 +184,19 @@ public class MyTubeClient {
     //Searches files on server that have relation with the name provided
     public static void clientFind(MyTubeInterface i) throws RemoteException {
         String name;
+        int in;
         Scanner reader = new Scanner(System.in);
 
         System.out.println("Please insert the name of the file you want to find:");
         name = reader.nextLine();
-        String results = i.find(name, true); //Client calls server to execute implementation's method to find the file
+        fileData[] af = i.find(name); //Client calls server to execute implementation's method to find the file
+        
+        System.out.println("These files have been found with your description:");
 
-        System.out.println(results);
+		for(in=0;in<af.length;in++){
+			System.out.println("Name: " + af[in].getName() + ", description: " + af[in].getDescription() + ", server id: " + af[in].getServerId());
+			
+		}
     }
 
     //Deletes files from server
