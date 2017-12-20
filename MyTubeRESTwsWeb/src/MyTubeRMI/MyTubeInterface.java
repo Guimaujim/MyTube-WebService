@@ -8,10 +8,10 @@ import java.util.Vector;
 //Interface of the server's implementation
 public interface MyTubeInterface extends Remote {
 
-    public byte[] download(String name, boolean repeat)
+    public byte[] download(String name, CallbackInterface c)
             throws java.rmi.RemoteException;
 
-    public String upload(byte[] file, String title)
+    public String upload(byte[] file, String title, String server_id, String description)
             throws java.rmi.RemoteException;
 
     public String find(String name, boolean repeat)

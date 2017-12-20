@@ -1,24 +1,24 @@
 package classData;
 
 public class serverData {
-	public String id;
+	public String server_id;
 	public String ip;
 	public String port;
 	
 	public serverData(){}
 	
 	public serverData(String id, String ip, String port){
-		this.id = id;
+		this.server_id = id;
 		this.ip = ip;
 		this.port = port;
 	}
 	
 	public void setId(String id){
-		this.id = id;
+		this.server_id = id;
 	}
 	
 	public String getId(){
-		return this.id;
+		return this.server_id;
 	}
 	
 	public void setIp(String ip){
@@ -38,6 +38,6 @@ public class serverData {
 	}
 	
 	public String getJson(){
-		return "{\"id\":\""+this.getId()+"\",\"ip\":\""+this.getIp()+"\", \"port\":\""+this.getPort()+"\"}";
+		return "{\"server_id\":\""+this.getId()+"\",\"ip\":\""+this.getIp()+"\", \"port\":\""+this.getPort()+"\"}";
 	}
 }

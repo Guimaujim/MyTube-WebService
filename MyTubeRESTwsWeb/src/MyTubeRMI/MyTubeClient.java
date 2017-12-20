@@ -15,17 +15,22 @@ public class MyTubeClient {
         String port;
         String IP;
         String input;
+        String server_id;
 
         System.out.println("Enter the IP of the server:");
         IP = reader.nextLine();
         System.out.println("Enter the port of the server:");
         port = reader.nextLine();
+        System.out.println("Enter the id for the server:");
+        //get to check
+        //check no spaces
+        server_id = reader.nextLine();
         System.out.println("Enter the IP of your client:");
         String clientIP = reader.nextLine();
         System.setProperty("java.rmi.server.hostname", clientIP); //Set so callbacks can work properly
 
         try {
-            String registryURL = "rmi://" + IP + ":" + port + "/mytube";
+            String registryURL = "rmi://" + IP + ":" + port + "/mytube/" + server_id;
             MyTubeInterface i = (MyTubeInterface) Naming.lookup(registryURL);
             CallbackInterface callbackObj = new CallbackImpl();
             i.addCallback(callbackObj); //Client adds to callback list
@@ -36,11 +41,11 @@ public class MyTubeClient {
                 input = reader.nextLine();
                 //Client waits for user's to decide what to do
 
-                if ("d".equals(input) || "download".equals(input)) {
-                    clientDownload(i);
+                if ("do".equals(input) || "download".equals(input)) {
+                    clientDownload(i, callbackObj);
                     System.out.println("Download completed!");
                 } else if ("u".equals(input) || "upload".equals(input)) {
-                    clientUpload(i);
+                    clientUpload(i, server_id);
                     System.out.println("Upload completed!");
                 } else if ("f".equals(input) || "find".equals(input)) {
                     clientFind(i);
@@ -62,14 +67,14 @@ public class MyTubeClient {
     }
 
 //Downloads file from server to client
-    public static void clientDownload(MyTubeInterface i) throws RemoteException {
+    public static void clientDownload(MyTubeInterface i, CallbackInterface c) throws RemoteException {
         String name;
         Scanner reader = new Scanner(System.in);
 
         System.out.println("Please insert the name of the file you want to download:");
         name = reader.nextLine();
         String path = "ClientMem/" + name;
-        byte[] file = i.download(name, true); //Client calls server to execute implementation's method to download the file
+        byte[] file = i.download(name, c); //Client calls server to execute implementation's method to download the file
 
         if (file.length == 0) {
             System.out.println("There isn't any file named like that");
@@ -124,15 +129,19 @@ public class MyTubeClient {
     }
 
     //Uploads file from client to server
-    public static void clientUpload(MyTubeInterface i) throws RemoteException {
+    public static void clientUpload(MyTubeInterface i, String server_id) throws RemoteException {
         String name;
         String key;
+        String description;
         File keys = new File("ClientMem/keys");
         Scanner reader = new Scanner(System.in);
 
         System.out.println("Please insert the name of the file you want to upload:");
         name = reader.nextLine();
-
+        
+        System.out.println("Please insert a description for the file you want to upload:");
+        description = reader.nextLine();
+        
         File folder = new File("ClientMem");
         String path = "ClientMem";
         File[] directory = folder.listFiles();
@@ -148,7 +157,7 @@ public class MyTubeClient {
                 BufferedInputStream input = new BufferedInputStream(new FileInputStream(path));
                 input.read(buffer, 0, buffer.length);
                 input.close();
-                key = i.upload(buffer, name); //Client calls server to execute implementation's method to upload the file
+                key = i.upload(buffer, name, server_id, description); //Client calls server to execute implementation's method to upload the file
 
                 if (key != null) {
                     try {

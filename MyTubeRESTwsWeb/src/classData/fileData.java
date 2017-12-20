@@ -5,7 +5,7 @@ import java.io.Serializable;
 public class fileData implements Serializable{
 	public String key;
 	public String name;
-	public String serverId;
+	public String server_id;
 	public String description;
 	
 	public fileData(){}
@@ -13,7 +13,7 @@ public class fileData implements Serializable{
 	public fileData(String name, String serverId, String key, String description){
 		this.key = key;
 		this.name = name;
-		this.serverId = serverId;
+		this.server_id = serverId;
 		this.description = description;
 	}
 	
@@ -25,7 +25,7 @@ public class fileData implements Serializable{
 		return this.key;
 	}
 	
-	public void setname(String name){
+	public void setName(String name){
 		this.name = name;
 	}
 	
@@ -34,14 +34,14 @@ public class fileData implements Serializable{
 	}
 	
 	public void setServerId(String serverId){
-		this.serverId = serverId;
+		this.server_id = serverId;
 	}
 	
 	public String getServerId(){
-		return this.serverId;
+		return this.server_id;
 	}
 	
-	public void setdescription(String description){
+	public void setDescription(String description){
 		this.description = description;
 	}
 	
@@ -50,7 +50,7 @@ public class fileData implements Serializable{
 	}
 	
 	public String getJson(){
-		return "{\"key\":\""+this.getKey()+"\",\"name\":\""+this.getName()+"\", \"serverId\":\""+this.getServerId()+"\", \"description\":\""+this.getDescription()+"\"}";
+		return "{\"key\":\""+this.getKey()+"\",\"name\":\""+this.getName()+"\", \"description\":\""+this.getDescription()+"\", \"server_id\":\""+this.getServerId()+"\"}";
 	}
 	
 }

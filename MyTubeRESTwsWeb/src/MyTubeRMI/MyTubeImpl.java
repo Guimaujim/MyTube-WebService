@@ -4,6 +4,18 @@ import java.rmi.*;
 import java.rmi.server.*;
 import java.util.*;
 import java.io.*;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import classData.fileData;
+import classData.serverData;
+
+import javax.ws.rs.core.MediaType;
+
+import com.google.gson.Gson;
 
 public class MyTubeImpl extends UnicastRemoteObject implements MyTubeInterface {
 
@@ -61,7 +73,7 @@ public class MyTubeImpl extends UnicastRemoteObject implements MyTubeInterface {
 
     //Sends file to client
     @Override
-    public byte[] download(String name, boolean repeat) throws RemoteException {
+    public byte[] download(String name, CallbackInterface c) throws RemoteException {
         File folder = new File("Database");
         String path = "Database";
         File[] directory = folder.listFiles();
@@ -82,20 +94,25 @@ public class MyTubeImpl extends UnicastRemoteObject implements MyTubeInterface {
                 return new byte[0];
             }
         } else {
-            if (repeat == true) {
-                for (int i = 0; i < MyTubeServers.size(); i++) {
-                    MyTubeInterface server
-                            = (MyTubeInterface) MyTubeServers.elementAt(i);
-                    byte buffer[] = server.download(name, false);
-
-                    if (buffer.length != 0) {
-                        return buffer;
-                    }
-                }
-                return new byte[0];
-            } else {
-                return new byte[0];
-            }
+			fileData[] af = getFileByName(name);
+			int num = c.chooseD(af);
+			
+			if(num == -1){
+				return new byte[0];
+			}
+			
+			serverData sd = getServer(af[num].getServerId());
+			
+            try {
+                String registryURL = "rmi://" + sd.getIp() + ":" + sd.getPort() + "/mytube/" + sd.getId();
+				MyTubeInterface i = (MyTubeInterface) Naming.lookup(registryURL);
+				return download(name, c);
+			} catch (MalformedURLException e) {
+				e.printStackTrace();
+			} catch (NotBoundException e) {
+				e.printStackTrace();
+			}
+        	return null;
         }
     }
 
@@ -116,6 +133,23 @@ public class MyTubeImpl extends UnicastRemoteObject implements MyTubeInterface {
             }
         }
         return found;
+    }
+    
+    public void delete(String key) {
+        File folder = new File("Database");
+        String path = "Database";
+        File[] directory = folder.listFiles();
+        searchAndDelete(directory, path, key);
+
+        try {
+            for (int i = 0; i < MyTubeServers.size(); i++) {
+                MyTubeInterface server
+                        = (MyTubeInterface) MyTubeServers.elementAt(i);
+                server.searchAndDeleteInit(key);
+            }
+        } catch (Exception e) {
+            System.out.println("Error! " + e);
+        }
     }
 
     @Override
@@ -151,27 +185,71 @@ public class MyTubeImpl extends UnicastRemoteObject implements MyTubeInterface {
 
     //Receives and saves file from client
     @Override
-    public String upload(byte[] file, String name
-    ) {
-        String ID = UUID.randomUUID().toString(); //Server generates a random unique key for the file
-        File dir = new File("Database/" + ID);
-        dir.mkdir();
-        String path = "Database/" + ID + "/" + name;
-
+    public String upload(byte[] file, String name, String server_id, String description) {
+        String ID;
+        
+        fileData f = new fileData();
+        f.setKey("");
+        f.setName(name);
+        f.setServerId(server_id);
+        f.setDescription(description);
+        
         try {
-            FileOutputStream FOS = new FileOutputStream(path);
-            BufferedOutputStream Output = new BufferedOutputStream(FOS);
-            Output.write(file, 0, file.length);
-            Output.flush();
-            Output.close();
-            //Server receives the byte array and flushes it into a file
-            callback();
-            //Server does a callback to all clients anouncing that a new file has been uploaded
-            return ID;
-        } catch (IOException e) {
-            System.out.println("Error!" + e.getMessage());
+            // Posting File on Database
+            ID = postFile(f); 
+            
+            //get to check
+            File dir = new File("Database/" + ID);
+            dir.mkdir();
+            String path = "Database/" + ID + "/" + name;
+            
+            try {
+                FileOutputStream FOS = new FileOutputStream(path);
+                BufferedOutputStream Output = new BufferedOutputStream(FOS);
+                Output.write(file, 0, file.length);
+                Output.flush();
+                Output.close();
+                //Server receives the byte array and flushes it into a file
+                callback();
+                //Server does a callback to all clients announcing that a new file has been uploaded
+                return ID;
+            } catch (IOException e) {
+                System.out.println("Error!" + e.getMessage());
+                return null;
+            }
+        } catch (IOException ex) {
+            Logger.getLogger(MyTubeImpl.class.getName())
+                    .log(Level.SEVERE, null, ex);
             return null;
         }
+    }
+    
+    public String postFile(fileData f) 
+    		throws IOException{
+    	 try {
+             URL url = new URL ("http://localhost:8080/MyTubeRESTwsWeb/rest/file/");
+             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+             conn.setDoOutput(true);
+             conn.setRequestMethod("POST");
+             conn.setRequestProperty("Content-Type", "application/json");
+             
+             OutputStream os = conn.getOutputStream();
+             os.write(f.getJson().getBytes());
+             os.flush();
+             
+             int status = conn.getResponseCode();
+             if(status != HttpURLConnection.HTTP_CREATED){ 
+                 throw new IOException();
+             }
+             BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+ 			 String key = br.readLine();
+             conn.disconnect();
+             return key;
+             
+         } catch (IOException e) {
+             System.out.println(e.toString());
+             return null;
+         }  
     }
 
     //Auxiliary method for server find so it can be a recursive method
@@ -233,24 +311,7 @@ public class MyTubeImpl extends UnicastRemoteObject implements MyTubeInterface {
         return StringArray;
     }
 
-    public void delete(String key) {
-        File folder = new File("Database");
-        String path = "Database";
-        File[] directory = folder.listFiles();
-        searchAndDelete(directory, path, key);
-
-        try {
-            for (int i = 0; i < MyTubeServers.size(); i++) {
-                MyTubeInterface server
-                        = (MyTubeInterface) MyTubeServers.elementAt(i);
-                server.searchAndDeleteInit(key);
-            }
-        } catch (Exception e) {
-            System.out.println("Error! " + e);
-        }
-    }
-
-    //It anounces to all clients that a new file has been uploaded
+    //It announces to all clients that a new file has been uploaded
     private void callback() {
         for (int i = 0; i < callbackObjects.size(); i++) {
             System.out.println("Now performing the " + i + "th callback\n");
@@ -267,5 +328,64 @@ public class MyTubeImpl extends UnicastRemoteObject implements MyTubeInterface {
                 }
             }
         }
+    }
+    
+    public fileData[] getFileByName(String name){
+    	try {
+			URL url = new URL ("http://localhost:8080/MyTubeRESTwsWeb/rest/filen/" + name);
+			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+			conn.setRequestMethod("GET");
+			conn.setRequestProperty("Accept", MediaType.APPLICATION_JSON);
+			if(conn.getResponseCode() != 200){
+				System.out.println(conn.getResponseCode());
+				return null;
+			}
+			int i;
+			BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+			String output = br.readLine();
+			conn.disconnect();
+			
+			Gson g = new Gson();
+			fileData[] af = g.fromJson(output, fileData[].class);
+			for(i=0;i<af.length;i++){
+				af[i].setKey(af[i].getKey().trim());
+				af[i].setName(af[i].getName().trim());
+				af[i].setDescription(af[i].getDescription().trim());
+				af[i].setServerId(af[i].getServerId().trim());
+			}
+			return af;
+					
+		} catch (Exception e) { 
+			System.out.println(e);
+			return null;
+		}
+    }
+    
+    public serverData getServer(String id){
+    	try {
+			URL url = new URL ("http://localhost:8080/MyTubeRESTwsWeb/rest/server/" + id);
+			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+			conn.setRequestMethod("GET");
+			conn.setRequestProperty("Accept", MediaType.APPLICATION_JSON);
+			if(conn.getResponseCode() != 200){
+				System.out.println(conn.getResponseCode());
+				return null;
+			}
+			int i;
+			BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+			String output = br.readLine();
+			conn.disconnect();
+			
+			Gson g = new Gson();
+			serverData as = g.fromJson(output, serverData.class);
+			as.setId(as.getId().trim());
+			as.setPort(as.getPort().trim());
+			as.setIp(as.getIp().trim());
+			return as;
+					
+		} catch (Exception e) { 
+			System.out.println(e);
+			return null;
+		}
     }
 }
