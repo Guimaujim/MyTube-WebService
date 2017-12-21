@@ -200,22 +200,7 @@ public class MyTubeImpl extends UnicastRemoteObject implements MyTubeInterface {
         }
     }
 
-    public void delete(String key) throws RemoteException {
-        fileData f = getFileByKey(key);
-        serverData sd = getServer(f.getServerId());
-
-        try {
-            String registryURL = "rmi://" + sd.getIp() + ":" + sd.getPort() + "/mytube/" + sd.getId();
-            MyTubeInterface i = (MyTubeInterface) Naming.lookup(registryURL);
-            i.deleteInit(key);
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        } catch (NotBoundException e) {
-            e.printStackTrace();
-        }
-    }
-
-    //Sends file to client searched by name
+    //Sends file to client searched by name and description
     @Override
     public byte[] downloadNameDescription(String name, String description, CallbackInterface c, String server_id) throws RemoteException {
         fileData[] af = getFileByNameDescriptionAndServer(name, description, server_id);
@@ -252,7 +237,7 @@ public class MyTubeImpl extends UnicastRemoteObject implements MyTubeInterface {
                 }
             }
         } else {
-            af = getFileByName(name);
+            af = getFileByNameAndDescription(name, description);
             int num = c.chooseD(af);
 
             if (num == -1) {
@@ -271,6 +256,21 @@ public class MyTubeImpl extends UnicastRemoteObject implements MyTubeInterface {
                 e.printStackTrace();
             }
             return null;
+        }
+    }
+    
+    public void delete(String key) throws RemoteException {
+        fileData f = getFileByKey(key);
+        serverData sd = getServer(f.getServerId());
+
+        try {
+            String registryURL = "rmi://" + sd.getIp() + ":" + sd.getPort() + "/mytube/" + sd.getId();
+            MyTubeInterface i = (MyTubeInterface) Naming.lookup(registryURL);
+            i.deleteInit(key);
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (NotBoundException e) {
+            e.printStackTrace();
         }
     }
 
