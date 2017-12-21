@@ -308,23 +308,19 @@ public class MyTubeResource {
 			Statement st = getStatement();
 			ResultSet rs = st.executeQuery("SELECT key, name, description, server_id FROM file "
 					+ "WHERE key ='" + key + "' AND server_id ='" + server_id + "';");
-			List<fileData> af = new ArrayList<>();
+			fileData f = new fileData();
 			if(!rs.isBeforeFirst()){
 				return Response.status(404).entity("File not found").build();
 			}else{
-				while(rs.next()){		
-					fileData f = new fileData();
-					f.setKey(rs.getString("key"));
-					f.setName(rs.getString("name"));
-					f.setDescription(rs.getString("description"));
-					f.setServerId(rs.getString("server_id"));
-					af.add(f);
-				}
-				rs.next();
+				rs.next();	
+				f.setKey(rs.getString("key"));
+				f.setName(rs.getString("name"));
+				f.setDescription(rs.getString("description"));
+				f.setServerId(rs.getString("server_id"));
 			}
 			
 			st.close();
-			return Response.status(200).entity(af).build();
+			return Response.status(200).entity(f).build();
 			
 		} catch (SQLException e) {
 			return Response.status(500).entity("Database ERROR" + e.toString()).build();
