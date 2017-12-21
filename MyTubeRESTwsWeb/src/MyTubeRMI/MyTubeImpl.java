@@ -53,7 +53,7 @@ public class MyTubeImpl extends UnicastRemoteObject implements MyTubeInterface {
         if (af != null) {
             if (af.length > 1) {
                 int j = c.chooseD(af);
-                String path = "Database/" + af[j].getKey() + "/" + name;
+                String path = "Database/" + af[j].getKey() + "/" + af[j].getName();
                 File userFile;
                 userFile = new File(path);
                 byte buffer[] = new byte[(int) userFile.length()]; //Server converts file into an array of bytes to be sent
@@ -67,7 +67,7 @@ public class MyTubeImpl extends UnicastRemoteObject implements MyTubeInterface {
                     return new byte[0];
                 }
             } else {
-                String path = "Database/" + af[0].getKey() + "/" + name;
+                String path = "Database/" + af[0].getKey() + "/" + af[0].getName();
                 File userFile;
                 userFile = new File(path);
                 byte buffer[] = new byte[(int) userFile.length()]; //Server converts file into an array of bytes to be sent
