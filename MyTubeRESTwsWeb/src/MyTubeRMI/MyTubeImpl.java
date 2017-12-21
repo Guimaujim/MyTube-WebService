@@ -94,7 +94,7 @@ public class MyTubeImpl extends UnicastRemoteObject implements MyTubeInterface {
             try {
                 String registryURL = "rmi://" + sd.getIp() + ":" + sd.getPort() + "/mytube/" + sd.getId();
 				MyTubeInterface i = (MyTubeInterface) Naming.lookup(registryURL);
-				return i.downloadName(name, c, sd.getId());
+				return i.downloadKey(af[num].getKey(), c, sd.getId());
 			} catch (MalformedURLException e) {
 				e.printStackTrace();
 			} catch (NotBoundException e) {
@@ -153,7 +153,7 @@ public class MyTubeImpl extends UnicastRemoteObject implements MyTubeInterface {
             try {
                 String registryURL = "rmi://" + sd.getIp() + ":" + sd.getPort() + "/mytube/" + sd.getId();
 				MyTubeInterface i = (MyTubeInterface) Naming.lookup(registryURL);
-				return i.downloadDescription(description, c, sd.getId());
+				return i.downloadKey(af[num].getKey(), c, sd.getId());
 			} catch (MalformedURLException e) {
 				e.printStackTrace();
 			} catch (NotBoundException e) {
