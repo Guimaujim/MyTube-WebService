@@ -25,7 +25,7 @@ public interface MyTubeInterface extends Remote {
     public void delete(String key)
             throws java.rmi.RemoteException;
     
-    public void searchAndDeleteInit(String key)
+    public void deleteInit(String key)
             throws java.rmi.RemoteException;
 
     public void addCallback(

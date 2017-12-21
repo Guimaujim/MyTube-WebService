@@ -103,25 +103,6 @@ public class MyTubeImpl extends UnicastRemoteObject implements MyTubeInterface {
         	return null;
         }
     }
-
-    //Auxiliary method so the server can find the files
-    public String search(File[] Files, String path, String name) {
-        String found = null;
-        for (File e : Files) {
-            if (e.isDirectory()) {
-                File folder = new File(path + "/" + e.getName());
-                found = search(folder.listFiles(), path + "/" + folder.getName(), name);
-                if (found != null) {
-                    return found;
-                }
-            } else {
-                if (e.getName().equalsIgnoreCase(name)) {
-                    return path + "/" + name;
-                }
-            }
-        }
-        return found;
-    }
     
     public void delete(String key) throws RemoteException {
 		fileData f = getFileByKey(key);
@@ -130,7 +111,7 @@ public class MyTubeImpl extends UnicastRemoteObject implements MyTubeInterface {
 		try {
 	        String registryURL = "rmi://" + sd.getIp() + ":" + sd.getPort() + "/mytube/" + sd.getId();
 			MyTubeInterface i = (MyTubeInterface) Naming.lookup(registryURL);
-			i.searchAndDeleteInit(key);
+			i.deleteInit(key);
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
 		} catch (NotBoundException e) {
@@ -139,35 +120,11 @@ public class MyTubeImpl extends UnicastRemoteObject implements MyTubeInterface {
     }
 
     @Override
-    public void searchAndDeleteInit(String key) {
-        File folder = new File("Database");
-        String path = "Database";
+    public void deleteInit(String key) {
+        File folder = new File("Database/" + key + "/");
         File[] directory = folder.listFiles();
-        searchAndDelete(directory, path, key);    
-    }
-
-    public void searchAndDelete(File[] Files, String path, String key) {
-        for (File e : Files) {
-            if (e.isDirectory() && e.getName().equals(key)) {
-                deleteDirectory(e);
-                e.delete();
-            } else if (e.isDirectory()) {
-                File folder = new File(path + "/" + e.getName());
-                searchAndDelete(folder.listFiles(), path + "/" + folder.getName(), key);
-            }
-        }
-        deleteFile(key);
-    }
-
-    public void deleteDirectory(File path) {
-        File[] files = path.listFiles();
-        for (int i = 0; i < files.length; i++) {
-            if (files[i].isDirectory()) {
-                deleteDirectory(files[i]);
-            } else {
-                files[i].delete();
-            }
-        }
+        directory[0].delete();
+        folder.delete();
     }
 
     //Receives and saves file from client
