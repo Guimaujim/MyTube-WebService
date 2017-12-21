@@ -33,9 +33,18 @@ public class MyTubeServer {
         System.out.println("Enter the port of the server:");
         port = reader.nextLine();
         System.out.println("Enter the id for the server:");
-        //get to check
-        //check no spaces or delete spaces
         server_id = reader.nextLine();
+        server_id = server_id.replaceAll("\\s", "_"); //Remove all spaces so URL can form correctly
+        //get to check
+
+        serverData test = getServer(server_id);
+        while (test != null) { //Check if id is already on use
+            System.out.println("Server id already taken, please try again");
+            server_id = reader.nextLine();
+            server_id = server_id.replaceAll("\\s", "_"); //Remove all spaces so URL can form correctly
+            test = getServer(server_id);
+        }
+
         System.setProperty("java.rmi.server.hostname", IP); //Set so the clients can connect properly
 
         serverData sd = new serverData();
@@ -43,8 +52,8 @@ public class MyTubeServer {
         sd.setPort(port);
         sd.setId(server_id);
 
+        // Posting server on Database
         try {
-            // Posting server on Database
             postServer(sd);
         } catch (IOException ex) {
             Logger.getLogger(MyTubeImpl.class.getName())
@@ -78,6 +87,7 @@ public class MyTubeServer {
         }
     }
 
+    //Calls WebService to post server on DataBase
     public static void postServer(serverData s)
             throws IOException {
         try {
@@ -104,6 +114,7 @@ public class MyTubeServer {
         }
     }
 
+    //Calls WebService to get server on DataBase
     public static serverData getServer(String server_Id) {
         try {
             URL url = new URL("http://localhost:8080/MyTubeRESTwsWeb/rest/server/" + server_Id);
@@ -111,7 +122,6 @@ public class MyTubeServer {
             conn.setRequestMethod("GET");
             conn.setRequestProperty("Accept", MediaType.APPLICATION_JSON);
             if (conn.getResponseCode() != 200) {
-                System.out.println(conn.getResponseCode());
                 return null;
             }
 

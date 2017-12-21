@@ -83,27 +83,27 @@ public class MyTubeImpl extends UnicastRemoteObject implements MyTubeInterface {
             }
         } else {
             af = getFileByName(name);
-            
-            if (af != null){
-	            int num = c.chooseD(af);
-	
-	            if (num == -1) {
-	                return new byte[0];
-	            }
-	
-	            serverData sd = getServer(af[num].getServerId());
-	
-	            try {
-	                String registryURL = "rmi://" + sd.getIp() + ":" + sd.getPort() + "/mytube/" + sd.getId();
-	                MyTubeInterface i = (MyTubeInterface) Naming.lookup(registryURL);
-	                return i.downloadKey(af[num].getKey(), c, sd.getId());
-	            } catch (MalformedURLException e) {
-	                e.printStackTrace();
-	            } catch (NotBoundException e) {
-	                e.printStackTrace();
-	            }
+
+            if (af != null) {
+                int num = c.chooseD(af);
+
+                if (num == -1) {
+                    return new byte[0];
+                }
+
+                serverData sd = getServer(af[num].getServerId());
+
+                try {
+                    String registryURL = "rmi://" + sd.getIp() + ":" + sd.getPort() + "/mytube/" + sd.getId();
+                    MyTubeInterface i = (MyTubeInterface) Naming.lookup(registryURL);
+                    return i.downloadKey(af[num].getKey(), c, sd.getId());
+                } catch (MalformedURLException e) {
+                    e.printStackTrace();
+                } catch (NotBoundException e) {
+                    e.printStackTrace();
+                }
             }
-            
+
             return new byte[0];
         }
     }
@@ -146,24 +146,24 @@ public class MyTubeImpl extends UnicastRemoteObject implements MyTubeInterface {
             }
         } else {
             af = getFileByDescription(description);
-            if (af != null){
-	            int num = c.chooseD(af);
-	
-	            if (num == -1) {
-	                return new byte[0];
-	            }
-	
-	            serverData sd = getServer(af[num].getServerId());
-	
-	            try {
-	                String registryURL = "rmi://" + sd.getIp() + ":" + sd.getPort() + "/mytube/" + sd.getId();
-	                MyTubeInterface i = (MyTubeInterface) Naming.lookup(registryURL);
-	                return i.downloadKey(af[num].getKey(), c, sd.getId());
-	            } catch (MalformedURLException e) {
-	                e.printStackTrace();
-	            } catch (NotBoundException e) {
-	                e.printStackTrace();
-	            }
+            if (af != null) {
+                int num = c.chooseD(af);
+
+                if (num == -1) {
+                    return new byte[0];
+                }
+
+                serverData sd = getServer(af[num].getServerId());
+
+                try {
+                    String registryURL = "rmi://" + sd.getIp() + ":" + sd.getPort() + "/mytube/" + sd.getId();
+                    MyTubeInterface i = (MyTubeInterface) Naming.lookup(registryURL);
+                    return i.downloadKey(af[num].getKey(), c, sd.getId());
+                } catch (MalformedURLException e) {
+                    e.printStackTrace();
+                } catch (NotBoundException e) {
+                    e.printStackTrace();
+                }
             }
             return new byte[0];
         }
@@ -191,18 +191,18 @@ public class MyTubeImpl extends UnicastRemoteObject implements MyTubeInterface {
             }
         } else {
             af = getFileByKey(key);
-            if (af != null){
-	            serverData sd = getServer(af.getServerId());
-	
-	            try {
-	                String registryURL = "rmi://" + sd.getIp() + ":" + sd.getPort() + "/mytube/" + sd.getId();
-	                MyTubeInterface i = (MyTubeInterface) Naming.lookup(registryURL);
-	                return i.downloadKey(key, c, sd.getId());
-	            } catch (MalformedURLException e) {
-	                e.printStackTrace();
-	            } catch (NotBoundException e) {
-	                e.printStackTrace();
-	            }
+            if (af != null) {
+                serverData sd = getServer(af.getServerId());
+
+                try {
+                    String registryURL = "rmi://" + sd.getIp() + ":" + sd.getPort() + "/mytube/" + sd.getId();
+                    MyTubeInterface i = (MyTubeInterface) Naming.lookup(registryURL);
+                    return i.downloadKey(key, c, sd.getId());
+                } catch (MalformedURLException e) {
+                    e.printStackTrace();
+                } catch (NotBoundException e) {
+                    e.printStackTrace();
+                }
             }
             return new byte[0];
         }
@@ -246,50 +246,27 @@ public class MyTubeImpl extends UnicastRemoteObject implements MyTubeInterface {
             }
         } else {
             af = getFileByNameAndDescription(name, description);
-            if (af != null){
-	            int num = c.chooseD(af);
-	
-	            if (num == -1) {
-	                return new byte[0];
-	            }
-	
-	            serverData sd = getServer(af[num].getServerId());
-	
-	            try {
-	                String registryURL = "rmi://" + sd.getIp() + ":" + sd.getPort() + "/mytube/" + sd.getId();
-	                MyTubeInterface i = (MyTubeInterface) Naming.lookup(registryURL);
-	                return i.downloadKey(af[num].getKey(), c, sd.getId());
-	            } catch (MalformedURLException e) {
-	                e.printStackTrace();
-	            } catch (NotBoundException e) {
-	                e.printStackTrace();
-	            }
+            if (af != null) {
+                int num = c.chooseD(af);
+
+                if (num == -1) {
+                    return new byte[0];
+                }
+
+                serverData sd = getServer(af[num].getServerId());
+
+                try {
+                    String registryURL = "rmi://" + sd.getIp() + ":" + sd.getPort() + "/mytube/" + sd.getId();
+                    MyTubeInterface i = (MyTubeInterface) Naming.lookup(registryURL);
+                    return i.downloadKey(af[num].getKey(), c, sd.getId());
+                } catch (MalformedURLException e) {
+                    e.printStackTrace();
+                } catch (NotBoundException e) {
+                    e.printStackTrace();
+                }
             }
             return new byte[0];
         }
-    }
-    
-    public void delete(String key) throws RemoteException {
-        fileData f = getFileByKey(key);
-        serverData sd = getServer(f.getServerId());
-
-        try {
-            String registryURL = "rmi://" + sd.getIp() + ":" + sd.getPort() + "/mytube/" + sd.getId();
-            MyTubeInterface i = (MyTubeInterface) Naming.lookup(registryURL);
-            i.deleteInit(key);
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        } catch (NotBoundException e) {
-            e.printStackTrace();
-        }
-    }
-
-    @Override
-    public void deleteInit(String key) {
-        File folder = new File("Database/" + key + "/");
-        File[] directory = folder.listFiles();
-        directory[0].delete();
-        folder.delete();
     }
 
     //Receives and saves file from client
@@ -333,6 +310,77 @@ public class MyTubeImpl extends UnicastRemoteObject implements MyTubeInterface {
         }
     }
 
+    //Deletes a file from a user using its key
+    public void delete(String key) throws RemoteException {
+        fileData f = getFileByKey(key);
+        serverData sd = getServer(f.getServerId());
+
+        try {
+            String registryURL = "rmi://" + sd.getIp() + ":" + sd.getPort() + "/mytube/" + sd.getId();
+            MyTubeInterface i = (MyTubeInterface) Naming.lookup(registryURL);
+            i.deleteInit(key);
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (NotBoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+    //Auxiliary file so files can be deleted regardless of where the user is connected
+    @Override
+    public void deleteInit(String key) {
+        File folder = new File("Database/" + key + "/");
+        File[] directory = folder.listFiles();
+        directory[0].delete();
+        folder.delete();
+    }
+
+    //Finds files by given name
+    @Override
+    public fileData[] findName(String name) {
+        return getFileByName(name);
+    }
+
+    //Finds files by given description
+    @Override
+    public fileData[] findDescription(String description) {
+        return getFileByDescription(description);
+    }
+
+    //Finds files by given key
+    @Override
+    public fileData findKey(String key) {
+        return getFileByKey(key);
+    }
+
+    //Finds files by given name and description
+    @Override
+    public fileData[] findNameDescription(String name, String description) {
+        return getFileByNameAndDescription(name, description);
+    }
+
+    //It announces to all clients that a new file has been uploaded
+    private void callback() {
+        for (int i = 0; i < callbackObjects.size(); i++) {
+            System.out.println("Now performing the " + i + "th callback\n");
+            CallbackInterface client
+                    = (CallbackInterface) callbackObjects.elementAt(i);
+            try {
+                client.callMe("New content has been uploaded!");
+            } catch (Exception e) {
+                System.out.println("Client has disconnected, removing from callback list");
+                try {
+                    unregisterForCallback(client);
+                } catch (Exception e2) {
+                    System.out.println("Error!");
+                }
+            }
+        }
+    }
+    
+    //------------------------------ WebService auxiliary functions ------------------------------
+
+    //Calls WebService to post file on DataBase
     public String postFile(fileData f)
             throws IOException {
         try {
@@ -361,46 +409,7 @@ public class MyTubeImpl extends UnicastRemoteObject implements MyTubeInterface {
         }
     }
 
-    //Auxiliary method for server find so it can be a recursive method
-    @Override
-    public fileData[] findName(String name) {
-        return getFileByName(name);
-    }
-
-    @Override
-    public fileData[] findDescription(String description) {
-        return getFileByDescription(description);
-    }
-
-    @Override
-    public fileData findKey(String key) {
-        return getFileByKey(key);
-    }
-
-    @Override
-    public fileData[] findNameDescription(String name, String description) {
-        return getFileByNameAndDescription(name, description);
-    }
-
-    //It announces to all clients that a new file has been uploaded
-    private void callback() {
-        for (int i = 0; i < callbackObjects.size(); i++) {
-            System.out.println("Now performing the " + i + "th callback\n");
-            CallbackInterface client
-                    = (CallbackInterface) callbackObjects.elementAt(i);
-            try {
-                client.callMe("New content has been uploaded!");
-            } catch (Exception e) {
-                System.out.println("Client has disconnected, removing from callback list");
-                try {
-                    unregisterForCallback(client);
-                } catch (Exception e2) {
-                    System.out.println("Error!");
-                }
-            }
-        }
-    }
-
+    //Calls WebService to get file from DataBase by name
     public fileData[] getFileByName(String name) {
         try {
             URL url = new URL("http://localhost:8080/MyTubeRESTwsWeb/rest/filen/" + name);
@@ -430,6 +439,7 @@ public class MyTubeImpl extends UnicastRemoteObject implements MyTubeInterface {
         }
     }
 
+    //Calls WebService to get file from DataBase by name and server
     public fileData[] getFileByNameAndServer(String name, String server_id) {
         try {
             URL url = new URL("http://localhost:8080/MyTubeRESTwsWeb/rest/filenas/" + name + "_" + server_id);
@@ -459,6 +469,7 @@ public class MyTubeImpl extends UnicastRemoteObject implements MyTubeInterface {
         }
     }
 
+    //Calls WebService to get file from DataBase by description
     public fileData[] getFileByDescription(String description) {
         try {
             URL url = new URL("http://localhost:8080/MyTubeRESTwsWeb/rest/filed/" + description);
@@ -488,6 +499,7 @@ public class MyTubeImpl extends UnicastRemoteObject implements MyTubeInterface {
         }
     }
 
+    //Calls WebService to get file from DataBase by description and server
     public fileData[] getFileByDescriptionAndServer(String description, String server_id) {
         try {
             URL url = new URL("http://localhost:8080/MyTubeRESTwsWeb/rest/filedas/" + description + "_" + server_id);
@@ -517,6 +529,7 @@ public class MyTubeImpl extends UnicastRemoteObject implements MyTubeInterface {
         }
     }
 
+    //Calls WebService to get file from DataBase by key
     public fileData getFileByKey(String key) {
         try {
             URL url = new URL("http://localhost:8080/MyTubeRESTwsWeb/rest/filek/" + key);
@@ -543,6 +556,7 @@ public class MyTubeImpl extends UnicastRemoteObject implements MyTubeInterface {
         }
     }
 
+    //Calls WebService to get file from DataBase by key and server
     public fileData getFileByKeyAndServer(String key, String server_id) {
         try {
             URL url = new URL("http://localhost:8080/MyTubeRESTwsWeb/rest/filekas/" + key + "_" + server_id);
@@ -569,6 +583,7 @@ public class MyTubeImpl extends UnicastRemoteObject implements MyTubeInterface {
         }
     }
 
+    //Calls WebService to get file from DataBase by name and description
     public fileData[] getFileByNameAndDescription(String name, String description) {
         try {
             URL url = new URL("http://localhost:8080/MyTubeRESTwsWeb/rest/filenad/" + name + "_" + description);
@@ -598,6 +613,7 @@ public class MyTubeImpl extends UnicastRemoteObject implements MyTubeInterface {
         }
     }
 
+    //Calls WebService to get file from DataBase by name, description and server
     public fileData[] getFileByNameDescriptionAndServer(String name, String description, String server_id) {
         try {
             URL url = new URL("http://localhost:8080/MyTubeRESTwsWeb/rest/filendas/" + name + "_" + description + "_" + server_id);
@@ -627,6 +643,7 @@ public class MyTubeImpl extends UnicastRemoteObject implements MyTubeInterface {
         }
     }
 
+    //Calls WebService to delete file from DataBase
     public void deleteFile(String key) {
         try {
             URL url = new URL("http://localhost:8080/MyTubeRESTwsWeb/rest/file/" + key + "/delete");
@@ -641,6 +658,7 @@ public class MyTubeImpl extends UnicastRemoteObject implements MyTubeInterface {
         }
     }
 
+    //Calls WebService to get server from DataBase
     public serverData getServer(String id) {
         try {
             URL url = new URL("http://localhost:8080/MyTubeRESTwsWeb/rest/server/" + id);
@@ -666,3 +684,4 @@ public class MyTubeImpl extends UnicastRemoteObject implements MyTubeInterface {
         }
     }
 }
+

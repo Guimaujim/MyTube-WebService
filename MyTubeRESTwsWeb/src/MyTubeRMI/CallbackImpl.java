@@ -21,6 +21,7 @@ public class CallbackImpl extends UnicastRemoteObject
         return returnMessage;
     }
     
+    //It lets the user choose the file it wants to download
     public int chooseD(fileData[] af) throws RemoteException {
     	int i, j;
         String id;
@@ -34,7 +35,6 @@ public class CallbackImpl extends UnicastRemoteObject
 			System.out.println("Name: " + af[i].getName() + ", description: " + af[i].getDescription() + ", server id: " + af[i].getServerId() + ", file number: " + j);
 			
 		}
-		//Range list
         id = reader.nextLine();
         
         if(id.equals("0")){
