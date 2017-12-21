@@ -35,8 +35,7 @@ public class MyTubeServer {
         System.out.println("Enter the id for the server:");
         server_id = reader.nextLine();
         server_id = server_id.replaceAll("\\s", "_"); //Remove all spaces so URL can form correctly
-        //get to check
-
+        
         serverData test = getServer(server_id);
         while (test != null) { //Check if id is already on use
             System.out.println("Server id already taken, please try again");
