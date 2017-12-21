@@ -77,34 +77,37 @@ public class MyTubeClient {
 //Downloads file from server to client
     public static void clientDownload(MyTubeInterface i, CallbackInterface c, String server_id) throws RemoteException {
         String name = "";
+        String description = "";
         String path = "";
         int in;
         byte[] file;
         Boolean option = false;
         Scanner reader = new Scanner(System.in);
-        
+
         System.out.println("Do you want to download the file by name, by description, both or by key? Use n for name and d for description");
         System.out.println("Use n for name, d for description, b for both or k for key");
-        
-        while(option == false){
-        	name = reader.nextLine();
-        	if (name.equals("d") || name.equals("description")){
-        		option = true;
-        	}else if (name.equals("n") || name.equals("name")){
-        		option = true;
-        	}else if (name.equals("k") || name.equals("key")){
-        		option = true;
-        	}else{
+
+        while (option == false) {
+            name = reader.nextLine();
+            if (name.equals("d") || name.equals("description")) {
+                option = true;
+            } else if (name.equals("n") || name.equals("name")) {
+                option = true;
+            } else if (name.equals("k") || name.equals("key")) {
+                option = true;
+            } else if (name.equals("b") || name.equals("both")) {
+                option = true;
+            } else {
                 System.out.println("Sorry, I couldn't understand that, please try again");
-        	}
+            }
         }
-        
-        if(name.equals("n") || name.equals("name")){
-	        System.out.println("Please insert the name of the file you want to download:");
-	        name = reader.nextLine();
-	        path = "ClientMem/" + name;
-	        file = i.downloadName(name, c, server_id); //Client calls server to execute implementation's method to download the file
-        }else if(name.equals("k") || name.equals("key")){
+
+        if (name.equals("n") || name.equals("name")) {
+            System.out.println("Please insert the name of the file you want to download:");
+            name = reader.nextLine();
+            path = "ClientMem/" + name;
+            file = i.downloadName(name, c, server_id); //Client calls server to execute implementation's method to download the file
+        } else if (name.equals("k") || name.equals("key")) {
             File keys = new File("ClientMem/keys");
 
             System.out.println("You currently have uploaded this files: ");
@@ -119,15 +122,23 @@ public class MyTubeClient {
             } catch (Exception e) {
                 System.out.println("Error!");
             }
-	        System.out.println("Please insert the key of the file you want to download:");
-	        name = reader.nextLine();
-	        file = i.downloadKey(name, c, server_id); //Client calls server to execute implementation's method to download the file
-	        path = "ClientMem/" + name;
-        }else{
-	        System.out.println("Please insert the description of the file you want to download:");
-	        name = reader.nextLine();
-	        file = i.downloadDescription(name, c, server_id); //Client calls server to execute implementation's method to download the file
-	        path = "ClientMem/" + name;
+            System.out.println("Please insert the key of the file you want to download:");
+            name = reader.nextLine();
+            file = i.downloadKey(name, c, server_id); //Client calls server to execute implementation's method to download the file
+            path = "ClientMem/" + name;
+        } else if (name.equals("b") || name.equals("both")) {
+            System.out.println("Please insert the and the description of the file you want to download:");
+            System.out.println("Name:");
+            name = reader.nextLine();
+            System.out.println("Description:");
+            description = reader.nextLine();
+            file = i.downloadNameDescription(name, description, c, server_id); //Client calls server to execute implementation's method to download the file
+            path = "ClientMem/" + name;
+        } else {
+            System.out.println("Please insert the description of the file you want to download:");
+            name = reader.nextLine();
+            file = i.downloadDescription(name, c, server_id); //Client calls server to execute implementation's method to download the file
+            path = "ClientMem/" + name;
         }
 
         if (file.length == 0) {
@@ -192,10 +203,10 @@ public class MyTubeClient {
 
         System.out.println("Please insert the name of the file you want to upload:");
         name = reader.nextLine();
-        
+
         System.out.println("Please insert a description for the file you want to upload:");
         description = reader.nextLine();
-        
+
         File folder = new File("ClientMem");
         String path = "ClientMem";
         File[] directory = folder.listFiles();
@@ -236,43 +247,86 @@ public class MyTubeClient {
     //Searches files on server that have relation with the name provided
     public static void clientFind(MyTubeInterface i) throws RemoteException {
         String name = "";
+        String description = "";
         int in;
         Boolean option = false;
         Scanner reader = new Scanner(System.in);
 
-        System.out.println("Do you want to find the file by name or by description? Use n for name and d for description");
-        
-        while(option == false){
-        	name = reader.nextLine();
-        	if (name.equals("d") || name.equals("description")){
-        		option = true;
-        	}else if (name.equals("n") || name.equals("name")){
-        		option = true;
-        	}else{
+        System.out.println("Do you want to find the file by name, by description, both or by key? Use n for name and d for description");
+        System.out.println("Use n for name, d for description, b for both or k for key");
+
+        while (option == false) {
+            name = reader.nextLine();
+            if (name.equals("d") || name.equals("description")) {
+                option = true;
+            } else if (name.equals("n") || name.equals("name")) {
+                option = true;
+            } else if (name.equals("k") || name.equals("key")) {
+                option = true;
+            } else if (name.equals("b") || name.equals("both")) {
+                option = true;
+            } else {
                 System.out.println("Sorry, I couldn't understand that, please try again");
-        	}
+            }
         }
-        
-        if(name.equals("n") || name.equals("name")){
-	        System.out.println("Please insert the name of the file you want to find:");
-	        name = reader.nextLine();
-	        fileData[] af = i.findName(name); //Client calls server to execute implementation's method to find the file
-	        
-	        System.out.println("These files have been found with your name:");
-	
-			for(in=0;in<af.length;in++){
-				System.out.println("Name: " + af[in].getName() + ", description: " + af[in].getDescription() + ", server id: " + af[in].getServerId());
-			}
-        }else{
-	        System.out.println("Please insert the description of the file you want to find:");
-	        name = reader.nextLine();
-	        fileData[] af = i.findDescription(name); //Client calls server to execute implementation's method to find the file
-	        
-	        System.out.println("These files have been found with your description:");
-	
-			for(in=0;in<af.length;in++){
-				System.out.println("Name: " + af[in].getName() + ", description: " + af[in].getDescription() + ", server id: " + af[in].getServerId());
-			}
+
+        if (name.equals("n") || name.equals("name")) {
+            System.out.println("Please insert the name of the file you want to find:");
+            name = reader.nextLine();
+            fileData[] af = i.findName(name); //Client calls server to execute implementation's method to find the file
+
+            System.out.println("These files have been found with your name:");
+
+            for (in = 0; in < af.length; in++) {
+                System.out.println("Name: " + af[in].getName() + ", description: " + af[in].getDescription() + ", server id: " + af[in].getServerId());
+            }
+        } else if (name.equals("k") || name.equals("key")) {
+            File keys = new File("ClientMem/keys");
+
+            System.out.println("You currently have uploaded this files: ");
+
+            try {
+                BufferedReader br = new BufferedReader(new FileReader(keys));
+                String line = null;
+                while ((line = br.readLine()) != null) {
+                    System.out.println(line);
+                }
+                br.close();
+            } catch (Exception e) {
+                System.out.println("Error!");
+            }
+            System.out.println("Please insert the key of the file you want to find:");
+            name = reader.nextLine();
+            fileData af = i.findKey(name); //Client calls server to execute implementation's method to download the file
+            
+            System.out.println("These file has been found with your key:");
+
+            System.out.println("Name: " + af.getName() + ", description: " + af.getDescription() + ", server id: " + af.getServerId());
+        } else if (name.equals("b") || name.equals("both")) {
+            System.out.println("Please insert the name of the file you want to find:");
+            System.out.println("Please insert the and the description of the file you want to download:");
+            System.out.println("Name:");
+            name = reader.nextLine();
+            System.out.println("Description:");
+            description = reader.nextLine();
+            
+            fileData[] af = i.findNameDescription(name, description); //Client calls server to execute implementation's method to find the file
+
+            System.out.println("These files have been found with your name:");
+
+            for (in = 0; in < af.length; in++) {
+                System.out.println("Name: " + af[in].getName() + ", description: " + af[in].getDescription() + ", server id: " + af[in].getServerId());
+            }
+        } else {
+            System.out.println("Please insert the description of the file you want to find:");
+            name = reader.nextLine();
+            fileData[] af = i.findDescription(name); //Client calls server to execute implementation's method to find the file
+
+            System.out.println("These files have been found with your description:");
+
+            for (in = 0; in < af.length; in++) {
+                System.out.println("Name: " + af[in].getName() + ", description: " + af[in].getDescription() + ", server id: " + af[in].getServerId());
+            }
         }
     }
 

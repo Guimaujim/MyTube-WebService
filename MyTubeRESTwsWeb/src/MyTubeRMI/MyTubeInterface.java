@@ -18,6 +18,9 @@ public interface MyTubeInterface extends Remote {
     
     public byte[] downloadKey(String name, CallbackInterface c, String server_id)
             throws java.rmi.RemoteException;
+    
+    public byte[] downloadNameDescription(String name, String description, CallbackInterface c, String server_id)
+            throws java.rmi.RemoteException;
 
     public String upload(byte[] file, String title, String server_id, String description)
             throws java.rmi.RemoteException;
@@ -26,6 +29,12 @@ public interface MyTubeInterface extends Remote {
             throws java.rmi.RemoteException;
     
     public fileData[] findDescription(String description)
+            throws java.rmi.RemoteException;
+    
+    public fileData findKey(String Key)
+            throws java.rmi.RemoteException;
+    
+    public fileData[] findNameDescription(String name, String description)
             throws java.rmi.RemoteException;
     
     public void delete(String key)
