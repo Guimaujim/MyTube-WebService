@@ -185,18 +185,46 @@ public class MyTubeClient {
     public static void clientFind(MyTubeInterface i) throws RemoteException {
         String name;
         int in;
+        Boolean option = false;
+        Boolean nord = false;
         Scanner reader = new Scanner(System.in);
 
-        System.out.println("Please insert the name of the file you want to find:");
-        name = reader.nextLine();
-        fileData[] af = i.find(name); //Client calls server to execute implementation's method to find the file
+        System.out.println("Do you want to find file by name or by description? Use n for name and d for description");
         
-        System.out.println("These files have been found with your description:");
-
-		for(in=0;in<af.length;in++){
-			System.out.println("Name: " + af[in].getName() + ", description: " + af[in].getDescription() + ", server id: " + af[in].getServerId());
-			
-		}
+        while(option == false){
+        	name = reader.nextLine();
+        	if (name.equals("d") || name.equals("description")){
+        		nord = false;
+        		option = true;
+        	}else if (name.equals("n") || name.equals("name")){
+        		nord = true;
+        		option = true;
+        	}else{
+                System.out.println("Sorry, I couldn't understand that, please try again");
+        	}
+        }
+        
+        if(nord == true){
+	        System.out.println("Please insert the name of the file you want to find:");
+	        name = reader.nextLine();
+	        fileData[] af = i.findName(name); //Client calls server to execute implementation's method to find the file
+	        
+	        System.out.println("These files have been found with your name:");
+	
+			for(in=0;in<af.length;in++){
+				System.out.println("Name: " + af[in].getName() + ", description: " + af[in].getDescription() + ", server id: " + af[in].getServerId());
+			}
+        }else{
+	        System.out.println("Please insert the description of the file you want to find:");
+	        name = reader.nextLine();
+	        fileData[] af = i.findDescription(name); //Client calls server to execute implementation's method to find the file
+	        
+	        System.out.println("These files have been found with your description:");
+	
+			for(in=0;in<af.length;in++){
+				System.out.println("Name: " + af[in].getName() + ", description: " + af[in].getDescription() + ", server id: " + af[in].getServerId());
+			}
+        }
     }
 
     //Deletes files from server

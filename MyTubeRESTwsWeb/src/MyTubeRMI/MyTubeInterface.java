@@ -16,7 +16,10 @@ public interface MyTubeInterface extends Remote {
     public String upload(byte[] file, String title, String server_id, String description)
             throws java.rmi.RemoteException;
 
-    public fileData[] find(String name)
+    public fileData[] findName(String name)
+            throws java.rmi.RemoteException;
+    
+    public fileData[] findDescription(String description)
             throws java.rmi.RemoteException;
     
     public void delete(String key)

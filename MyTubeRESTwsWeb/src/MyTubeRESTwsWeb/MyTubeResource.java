@@ -63,7 +63,7 @@ public class MyTubeResource {
 	@Path("/file")
 	public Response postFile(fileData f) throws SQLException {
 		Statement st = getStatement();
-		String key = UUID.randomUUID().toString(); //Server generates a random unique key for the file
+		String key = UUID.randomUUID().toString(); //WebService generates a random unique key for the file
 			
 		try{
 			st.executeUpdate("INSERT INTO file(key, name, description, server_id) VALUES ("
@@ -95,7 +95,39 @@ public class MyTubeResource {
 				while(rs.next()){		
 					fileData f = new fileData();
 					f.setKey(rs.getString("key"));
-					f.setName(name);
+					f.setName(rs.getString("name"));
+					f.setDescription(rs.getString("description"));
+					f.setServerId(rs.getString("server_id"));
+					af.add(f);
+				}
+				rs.next();
+			}
+			
+			st.close();
+			return Response.status(200).entity(af).build();
+			
+		} catch (SQLException e) {
+			return Response.status(500).entity("Database ERROR" + e.toString()).build();
+		}
+	}
+	
+	// GET a File by description
+	@GET
+	@Path("/filed/{description}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getFileByDescription(@PathParam("description") String description){	 
+		try {
+			Statement st = getStatement();
+			ResultSet rs = st.executeQuery("SELECT key, name, description, server_id FROM file "
+					+ "WHERE description LIKE'%" + description + "%';");
+			List<fileData> af = new ArrayList<>();
+			if(!rs.isBeforeFirst()){
+				return Response.status(404).entity("File not found").build();
+			}else{
+				while(rs.next()){		
+					fileData f = new fileData();
+					f.setKey(rs.getString("key"));
+					f.setName(rs.getString("name"));
 					f.setDescription(rs.getString("description"));
 					f.setServerId(rs.getString("server_id"));
 					af.add(f);
@@ -126,7 +158,7 @@ public class MyTubeResource {
 			}else{
 				rs.next();
 				f.setKey(rs.getString("key"));
-				f.setName(key);
+				f.setName(rs.getString("name"));
 				f.setDescription(rs.getString("description"));
 				f.setServerId(rs.getString("server_id"));
 			}

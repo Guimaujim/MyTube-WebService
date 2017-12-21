@@ -227,8 +227,13 @@ public class MyTubeImpl extends UnicastRemoteObject implements MyTubeInterface {
 
     //Auxiliary method for server find so it can be a recursive method
     @Override
-    public fileData[] find(String name) {	
+    public fileData[] findName(String name) {	
     	return getFileByName(name);
+    }
+    
+    @Override
+    public fileData[] findDescription(String description) {	
+    	return getFileByDescription(description);
     }
 
     //It announces to all clients that a new file has been uploaded
@@ -273,8 +278,37 @@ public class MyTubeImpl extends UnicastRemoteObject implements MyTubeInterface {
 				af[i].setDescription(af[i].getDescription().trim());
 				af[i].setServerId(af[i].getServerId().trim());
 			}
-			return af;
-					
+			return af;		
+		} catch (Exception e) { 
+			System.out.println(e);
+			return null;
+		}
+    }
+    
+    public fileData[] getFileByDescription(String description){
+    	try {
+			URL url = new URL ("http://localhost:8080/MyTubeRESTwsWeb/rest/filed/" + description);
+			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+			conn.setRequestMethod("GET");
+			conn.setRequestProperty("Accept", MediaType.APPLICATION_JSON);
+			if(conn.getResponseCode() != 200){
+				System.out.println(conn.getResponseCode());
+				return null;
+			}
+			int i;
+			BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+			String output = br.readLine();
+			conn.disconnect();
+			
+			Gson g = new Gson();
+			fileData[] af = g.fromJson(output, fileData[].class);
+			for(i=0;i<af.length;i++){
+				af[i].setKey(af[i].getKey().trim());
+				af[i].setName(af[i].getName().trim());
+				af[i].setDescription(af[i].getDescription().trim());
+				af[i].setServerId(af[i].getServerId().trim());
+			}
+			return af;				
 		} catch (Exception e) { 
 			System.out.println(e);
 			return null;
@@ -291,7 +325,6 @@ public class MyTubeImpl extends UnicastRemoteObject implements MyTubeInterface {
 				System.out.println(conn.getResponseCode());
 				return null;
 			}
-			int i;
 			BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
 			String output = br.readLine();
 			conn.disconnect();
@@ -302,8 +335,7 @@ public class MyTubeImpl extends UnicastRemoteObject implements MyTubeInterface {
 			f.setName(f.getName().trim());
 			f.setDescription(f.getDescription().trim());
 			f.setServerId(f.getServerId().trim());
-			return f;
-					
+			return f;	
 		} catch (Exception e) { 
 			System.out.println(e);
 			return null;
@@ -334,7 +366,6 @@ public class MyTubeImpl extends UnicastRemoteObject implements MyTubeInterface {
 				System.out.println(conn.getResponseCode());
 				return null;
 			}
-			int i;
 			BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
 			String output = br.readLine();
 			conn.disconnect();
@@ -344,8 +375,7 @@ public class MyTubeImpl extends UnicastRemoteObject implements MyTubeInterface {
 			as.setId(as.getId().trim());
 			as.setPort(as.getPort().trim());
 			as.setIp(as.getIp().trim());
-			return as;
-					
+			return as;			
 		} catch (Exception e) { 
 			System.out.println(e);
 			return null;
