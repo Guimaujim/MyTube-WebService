@@ -58,7 +58,6 @@ public class MyTubeServer {
             startRegistry(Integer.parseInt(port));
             String registryURL = "rmi://" + IP + ":" + port + "/mytube/" + server_id;
             Naming.rebind(registryURL, exportedObj);
-            joinServer(exportedObj);
             System.out.println("MyTube Server ready.");
         } catch (Exception ex) {
             System.out.println("Error!");
@@ -77,36 +76,6 @@ public class MyTubeServer {
             Registry registry = LocateRegistry.createRegistry(RMIPortNum);
             System.out.println(
                     "RMI registry created at port " + RMIPortNum);
-        }
-    }
-
-    //Let's servers join together
-    public static void joinServer(MyTubeImpl self)
-            throws RemoteException, NotBoundException, MalformedURLException {
-        String port;
-        String IP;
-        String server_id;
-        Vector list = new Vector();
-        Scanner reader = new Scanner(System.in);
-
-        System.out.println("Do you want this server to connect to another?");
-        String s = reader.nextLine();
-        if ("y".equals(s) || "yes".equals(s)) {
-            System.out.println("Enter the IP of the server:");
-            IP = reader.nextLine();
-
-            System.out.println("Enter the port of the server:");
-            port = reader.nextLine();
-            
-            System.out.println("Enter the id for the server:");
-            //get to check
-            //check no spaces or delete spaces
-            server_id = reader.nextLine();
-
-            String registryURL = "rmi://" + IP + ":" + port + "/mytube/" + server_id;
-            MyTubeInterface i = (MyTubeInterface) Naming.lookup(registryURL);
-            list = i.addServerAll(self);
-            self.copyServers(list);
         }
     }
     

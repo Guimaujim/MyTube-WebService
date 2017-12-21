@@ -20,12 +20,10 @@ import com.google.gson.Gson;
 public class MyTubeImpl extends UnicastRemoteObject implements MyTubeInterface {
 
     private static Vector callbackObjects; //Vector for all the clients we need to do a callback
-    private static Vector MyTubeServers; //Vector for all the servers currently connected
 
     public MyTubeImpl() throws RemoteException {
         super();
         callbackObjects = new Vector();
-        MyTubeServers = new Vector();
     }
 
     //Adds client to callback vector
@@ -33,30 +31,6 @@ public class MyTubeImpl extends UnicastRemoteObject implements MyTubeInterface {
     public void addCallback(CallbackInterface CallbackObject) {
         System.out.println("Server got an 'addCallback' call.");
         callbackObjects.addElement(CallbackObject);
-    }
-
-    //Adds servers to vector
-    @Override
-    public Vector addServerAll(MyTubeInterface MyTubeServer) {
-        System.out.println("Server got a server request");
-        for (int i = 0; i < MyTubeServers.size(); i++) {
-            MyTubeInterface server
-                    = (MyTubeInterface) MyTubeServers.elementAt(i);
-            addServer(server);
-        }
-        MyTubeServers.addElement(MyTubeServer);
-        return MyTubeServers;
-    }
-
-    //Auxiliary file to add servers
-    public void addServer(MyTubeInterface MyTubeServer) {
-        System.out.println("Server got a server request: " + MyTubeServer);
-        MyTubeServers.addElement(MyTubeServer);
-    }
-
-    //Auxiliary file to update new server
-    public void copyServers(Vector MyTubeServer) {
-        MyTubeServers = MyTubeServer;
     }
 
     //Removes client from callback vector
@@ -155,7 +129,7 @@ public class MyTubeImpl extends UnicastRemoteObject implements MyTubeInterface {
         File folder = new File("Database");
         String path = "Database";
         File[] directory = folder.listFiles();
-        searchAndDelete(directory, path, key);
+        searchAndDelete(directory, path, key);    
     }
 
     public void searchAndDelete(File[] Files, String path, String key) {
@@ -168,6 +142,7 @@ public class MyTubeImpl extends UnicastRemoteObject implements MyTubeInterface {
                 searchAndDelete(folder.listFiles(), path + "/" + folder.getName(), key);
             }
         }
+        deleteFile(key);
     }
 
     public void deleteDirectory(File path) {
@@ -256,28 +231,6 @@ public class MyTubeImpl extends UnicastRemoteObject implements MyTubeInterface {
     	return getFileByName(name);
     }
 
-    //Searches for files that contain the given name
-    public ArrayList<String> serverFind(File[] Files, String path, String name) {
-        ArrayList<String> StringArray = new ArrayList<String>();
-
-        for (File e : Files) {
-            if (e.isDirectory()) {
-                File folder = new File(path + "/" + e.getName());
-                ArrayList<String> temp = serverFind(folder.listFiles(), path + "/" + folder.getName(), name);
-                //If it's a directory the method calls itself again for that directory
-                for (String s : temp) {
-                    StringArray.add(s);
-                }
-            } else {
-                if (e.getName().toLowerCase().contains(name.toLowerCase())) {
-                    StringArray.add(e.getName());
-                }
-            }
-        }
-
-        return StringArray;
-    }
-
     //It announces to all clients that a new file has been uploaded
     private void callback() {
         for (int i = 0; i < callbackObjects.size(); i++) {
@@ -354,6 +307,20 @@ public class MyTubeImpl extends UnicastRemoteObject implements MyTubeInterface {
 		} catch (Exception e) { 
 			System.out.println(e);
 			return null;
+		}
+    }
+    
+    public void deleteFile(String key){
+    	try {
+			URL url = new URL ("http://localhost:8080/MyTubeRESTwsWeb/rest/file/" + key + "/delete");
+			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+			conn.setRequestMethod("DELETE");
+			conn.setRequestProperty("Accept", MediaType.APPLICATION_JSON);
+			if(conn.getResponseCode() != 204){
+				System.out.println(conn.getResponseCode());
+			}				
+		} catch (Exception e) { 
+			System.out.println(e);
 		}
     }
     

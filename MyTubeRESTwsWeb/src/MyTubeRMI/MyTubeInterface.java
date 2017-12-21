@@ -32,8 +32,4 @@ public interface MyTubeInterface extends Remote {
     public void unregisterForCallback(
             CallbackInterface callbackClientObject)
             throws java.rmi.RemoteException;
-
-    public Vector addServerAll(
-            MyTubeInterface MyTubeServer)
-            throws java.rmi.RemoteException;
 }
