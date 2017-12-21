@@ -274,11 +274,15 @@ public class MyTubeClient {
             System.out.println("Please insert the name of the file you want to find:");
             name = reader.nextLine();
             fileData[] af = i.findName(name); //Client calls server to execute implementation's method to find the file
-
-            System.out.println("These files have been found with your name:");
-
-            for (in = 0; in < af.length; in++) {
-                System.out.println("Name: " + af[in].getName() + ", description: " + af[in].getDescription() + ", server id: " + af[in].getServerId());
+            
+            if (af != null){
+	            System.out.println("These files have been found with your name:");
+	
+	            for (in = 0; in < af.length; in++) {
+	                System.out.println("Name: " + af[in].getName() + ", description: " + af[in].getDescription() + ", server id: " + af[in].getServerId());
+	            }
+            }else{
+            	System.out.println("File not found");
             }
         } else if (name.equals("k") || name.equals("key")) {
             File keys = new File("ClientMem/keys");
@@ -298,10 +302,13 @@ public class MyTubeClient {
             System.out.println("Please insert the key of the file you want to find:");
             name = reader.nextLine();
             fileData af = i.findKey(name); //Client calls server to execute implementation's method to download the file
-            
-            System.out.println("These file has been found with your key:");
 
-            System.out.println("Name: " + af.getName() + ", description: " + af.getDescription() + ", server id: " + af.getServerId());
+            if (af != null){
+	            System.out.println("These file has been found with your key:");
+	            System.out.println("Name: " + af.getName() + ", description: " + af.getDescription() + ", server id: " + af.getServerId());
+            } else {
+            	System.out.println("File not found");
+            }
         } else if (name.equals("b") || name.equals("both")) {
             System.out.println("Please insert the name of the file you want to find:");
             System.out.println("Please insert the and the description of the file you want to download:");
@@ -309,23 +316,31 @@ public class MyTubeClient {
             name = reader.nextLine();
             System.out.println("Description:");
             description = reader.nextLine();
-            
+
             fileData[] af = i.findNameDescription(name, description); //Client calls server to execute implementation's method to find the file
 
-            System.out.println("These files have been found with your name:");
-
-            for (in = 0; in < af.length; in++) {
-                System.out.println("Name: " + af[in].getName() + ", description: " + af[in].getDescription() + ", server id: " + af[in].getServerId());
+            if (af != null){
+	            System.out.println("These files have been found with your name:");
+	
+	            for (in = 0; in < af.length; in++) {
+	                System.out.println("Name: " + af[in].getName() + ", description: " + af[in].getDescription() + ", server id: " + af[in].getServerId());
+	            }
+            } else {
+            	System.out.println("File not found");
             }
         } else {
             System.out.println("Please insert the description of the file you want to find:");
             name = reader.nextLine();
             fileData[] af = i.findDescription(name); //Client calls server to execute implementation's method to find the file
 
-            System.out.println("These files have been found with your description:");
-
-            for (in = 0; in < af.length; in++) {
-                System.out.println("Name: " + af[in].getName() + ", description: " + af[in].getDescription() + ", server id: " + af[in].getServerId());
+            if (af != null){
+	            System.out.println("These files have been found with your description:");
+	
+	            for (in = 0; in < af.length; in++) {
+	                System.out.println("Name: " + af[in].getName() + ", description: " + af[in].getDescription() + ", server id: " + af[in].getServerId());
+	            }
+            } else {
+            	System.out.println("File not found");
             }
         }
     }

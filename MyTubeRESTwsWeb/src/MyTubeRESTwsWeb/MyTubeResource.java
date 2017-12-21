@@ -1,6 +1,5 @@
 package MyTubeRESTwsWeb;
 
-
 import java.io.File;
 import java.io.IOException;
 import java.sql.Connection;
@@ -36,373 +35,372 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import com.google.gson.Gson;
 
-
 @RequestScoped
 @Path("")
-@Produces({ "application/xml", "application/json" })
-@Consumes({ "application/xml", "application/json" })
+@Produces({"application/xml", "application/json"})
+@Consumes({"application/xml", "application/json"})
 public class MyTubeResource {
-    
-	// Handles the data base requests
-	public Statement getStatement(){
-		try {
-			InitialContext cxt = new InitialContext();
-			DataSource data = (DataSource) cxt.lookup("java:/PostgresXADS");
-			Connection connection = data.getConnection();
-			Statement statement = connection.createStatement();
-			return statement;
-				
-		} catch (Exception e) {
-			System.out.println("DB not loaded");
-			return null;
-		}
-	}
-	
-	// POST a File
-	@POST
-	@Path("/file")
-	public Response postFile(fileData f) throws SQLException {
-		Statement st = getStatement();
-		String key = UUID.randomUUID().toString(); //WebService generates a random unique key for the file
-			
-		try{
-			st.executeUpdate("INSERT INTO file(key, name, description, server_id) VALUES ("
-					+ "'" + key + "'," 
-					+ "'" + f.getName() +  "',"
-					+ "'" + f.getDescription() +  "'," 
-					+ "'" + f.getServerId() +  "');");
-		} catch (Exception e) {  
-	        System.err.println(e.getMessage()); 
-	    } 
 
-		st.close();
-		return Response.status(201).entity(key).build();
-	}
-	
-	// GET a File by name
-	@GET
-	@Path("/filen/{name}")
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response getFileByName(@PathParam("name") String name){	 
-		try {
-			Statement st = getStatement();
-			ResultSet rs = st.executeQuery("SELECT key, name, description, server_id FROM file "
-					+ "WHERE name LIKE'%" + name + "%';");
-			List<fileData> af = new ArrayList<>();
-			if(!rs.isBeforeFirst()){
-				return Response.status(404).entity("File not found").build();
-			}else{
-				while(rs.next()){		
-					fileData f = new fileData();
-					f.setKey(rs.getString("key"));
-					f.setName(rs.getString("name"));
-					f.setDescription(rs.getString("description"));
-					f.setServerId(rs.getString("server_id"));
-					af.add(f);
-				}
-				rs.next();
-			}
-			
-			st.close();
-			return Response.status(200).entity(af).build();
-			
-		} catch (SQLException e) {
-			return Response.status(500).entity("Database ERROR" + e.toString()).build();
-		}
-	}
-	
-	// GET a File by name and server
-	@GET
-	@Path("/filenas/{name}_{server_id}")
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response getFileByNameAndServer(@PathParam("name") String name, @PathParam("server_id") String server_id){	 
-		try {
-			Statement st = getStatement();
-			ResultSet rs = st.executeQuery("SELECT key, name, description, server_id FROM file "
-					+ "WHERE name LIKE'%" + name + "%' AND server_id ='" + server_id + "';");
-			List<fileData> af = new ArrayList<>();
-			if(!rs.isBeforeFirst()){
-				return Response.status(404).entity("File not found").build();
-			}else{
-				while(rs.next()){		
-					fileData f = new fileData();
-					f.setKey(rs.getString("key"));
-					f.setName(rs.getString("name"));
-					f.setDescription(rs.getString("description"));
-					f.setServerId(rs.getString("server_id"));
-					af.add(f);
-				}
-				rs.next();
-			}
-			
-			st.close();
-			return Response.status(200).entity(af).build();
-			
-		} catch (SQLException e) {
-			return Response.status(500).entity("Database ERROR" + e.toString()).build();
-		}
-	}
-	
-	// GET a File by description
-	@GET
-	@Path("/filed/{description}")
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response getFileByDescription(@PathParam("description") String description){	 
-		try {
-			Statement st = getStatement();
-			ResultSet rs = st.executeQuery("SELECT key, name, description, server_id FROM file "
-					+ "WHERE description LIKE'%" + description + "%';");
-			List<fileData> af = new ArrayList<>();
-			if(!rs.isBeforeFirst()){
-				return Response.status(404).entity("File not found").build();
-			}else{
-				while(rs.next()){		
-					fileData f = new fileData();
-					f.setKey(rs.getString("key"));
-					f.setName(rs.getString("name"));
-					f.setDescription(rs.getString("description"));
-					f.setServerId(rs.getString("server_id"));
-					af.add(f);
-				}
-				rs.next();
-			}
-			
-			st.close();
-			return Response.status(200).entity(af).build();
-			
-		} catch (SQLException e) {
-			return Response.status(500).entity("Database ERROR" + e.toString()).build();
-		}
-	}
-	
-	// GET a File by description and server
-	@GET
-	@Path("/filedas/{description}_{server_id}")
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response getFileByDescriptionAndServer(@PathParam("description") String description, @PathParam("server_id") String server_id){	 
-		try {
-			Statement st = getStatement();
-			ResultSet rs = st.executeQuery("SELECT key, name, description, server_id FROM file "
-					+ "WHERE description LIKE'%" + description + "%' AND server_id ='" + server_id + "';");
-			List<fileData> af = new ArrayList<>();
-			if(!rs.isBeforeFirst()){
-				return Response.status(404).entity("File not found").build();
-			}else{
-				while(rs.next()){		
-					fileData f = new fileData();
-					f.setKey(rs.getString("key"));
-					f.setName(rs.getString("name"));
-					f.setDescription(rs.getString("description"));
-					f.setServerId(rs.getString("server_id"));
-					af.add(f);
-				}
-				rs.next();
-			}
-			
-			st.close();
-			return Response.status(200).entity(af).build();
-			
-		} catch (SQLException e) {
-			return Response.status(500).entity("Database ERROR" + e.toString()).build();
-		}
-	}
-	
-	// GET a File by name and description
-	@GET
-	@Path("/filenad/{name}_{description}")
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response getFileByNameAndDescription(@PathParam("name") String name, @PathParam("description") String description){	 
-		try {
-			Statement st = getStatement();
-			ResultSet rs = st.executeQuery("SELECT key, name, description, server_id FROM file "
-					+ "WHERE name LIKE'%" + name + "%' AND description LIKE'%" + description + "%';");
-			List<fileData> af = new ArrayList<>();
-			if(!rs.isBeforeFirst()){
-				return Response.status(404).entity("File not found").build();
-			}else{
-				while(rs.next()){		
-					fileData f = new fileData();
-					f.setKey(rs.getString("key"));
-					f.setName(rs.getString("name"));
-					f.setDescription(rs.getString("description"));
-					f.setServerId(rs.getString("server_id"));
-					af.add(f);
-				}
-				rs.next();
-			}
-			
-			st.close();
-			return Response.status(200).entity(af).build();
-			
-		} catch (SQLException e) {
-			return Response.status(500).entity("Database ERROR" + e.toString()).build();
-		}
-	}
-	
-	// GET a File by name, description and server
-	@GET
-	@Path("/filendas/{name}_{description}_{server_id}")
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response getFileByNameDescriptionAndServer(@PathParam("name") String name, @PathParam("description") String description, @PathParam("server_id") String server_id){	 
-		try {
-			Statement st = getStatement();
-			ResultSet rs = st.executeQuery("SELECT key, name, description, server_id FROM file "
-					+ "WHERE name LIKE'%" + name + "%' AND description LIKE'%" + description + "% AND server_id ='" + server_id + "';");
-			List<fileData> af = new ArrayList<>();
-			if(!rs.isBeforeFirst()){
-				return Response.status(404).entity("File not found").build();
-			}else{
-				while(rs.next()){		
-					fileData f = new fileData();
-					f.setKey(rs.getString("key"));
-					f.setName(rs.getString("name"));
-					f.setDescription(rs.getString("description"));
-					f.setServerId(rs.getString("server_id"));
-					af.add(f);
-				}
-				rs.next();
-			}
-			
-			st.close();
-			return Response.status(200).entity(af).build();
-			
-		} catch (SQLException e) {
-			return Response.status(500).entity("Database ERROR" + e.toString()).build();
-		}
-	}
-	
-	// GET a File by key
-	@GET
-	@Path("/filek/{key}")
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response getFileByKey(@PathParam("key") String key){	 
-		try {
-			Statement st = getStatement();
-			ResultSet rs = st.executeQuery("SELECT key, name, description, server_id FROM file "
-					+ "WHERE key ='" + key + "';");
-			fileData f = new fileData();
-			if(!rs.isBeforeFirst()){
-				return Response.status(404).entity("File not found").build();
-			}else{
-				rs.next();
-				f.setKey(rs.getString("key"));
-				f.setName(rs.getString("name"));
-				f.setDescription(rs.getString("description"));
-				f.setServerId(rs.getString("server_id"));
-			}
-			
-			st.close();
-			return Response.status(200).entity(f).build();
-			
-		} catch (SQLException e) {
-			return Response.status(500).entity("Database ERROR" + e.toString()).build();
-		}
-	}
-	
-	// GET a File by name and description
-	@GET
-	@Path("/filekas/{key}_{server_id}")
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response getFileByKeyAndServer(@PathParam("key") String key, @PathParam("server_id") String server_id){	 
-		try {
-			Statement st = getStatement();
-			ResultSet rs = st.executeQuery("SELECT key, name, description, server_id FROM file "
-					+ "WHERE key ='" + key + "' AND server_id ='" + server_id + "';");
-			fileData f = new fileData();
-			if(!rs.isBeforeFirst()){
-				return Response.status(404).entity("File not found").build();
-			}else{
-				rs.next();	
-				f.setKey(rs.getString("key"));
-				f.setName(rs.getString("name"));
-				f.setDescription(rs.getString("description"));
-				f.setServerId(rs.getString("server_id"));
-			}
-			
-			st.close();
-			return Response.status(200).entity(f).build();
-			
-		} catch (SQLException e) {
-			return Response.status(500).entity("Database ERROR" + e.toString()).build();
-		}
-	}
-	
-	// DELETE a File by key
-	@DELETE
-	@Path("/file/{key}/delete")
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response deleteFile(@PathParam("key") String key){
-		try{
-			Statement st = getStatement();
-			st.executeUpdate("DELETE FROM file WHERE key = '" + key + "';");
-			st.close();
-			return Response.status(204).build();
-			
-		}catch(SQLException ex){
-			return Response.status(500).entity("Database ERROR").build();
-		}
-	}
-    
-	// POST a Server
-	@POST
-	@Path("/server")
-	public Response postServer(serverData s) throws SQLException{
-		Statement st = getStatement();
-		
-		try {
-			st.executeUpdate("INSERT INTO server(server_id, ip, port) VALUES ("
-							+ "'" + s.getId() + "'," 
-							+ "'" + s.getIp() +  "',"
-							+ "'" + s.getPort() +  "');");
+    // Handles the data base requests
+    public Statement getStatement() {
+        try {
+            InitialContext cxt = new InitialContext();
+            DataSource data = (DataSource) cxt.lookup("java:/PostgresXADS");
+            Connection connection = data.getConnection();
+            Statement statement = connection.createStatement();
+            return statement;
 
-		} catch (Exception e) {
-			System.err.println(e.getMessage()); 
-		}
-		
-		st.close();
-		return Response.status(201).entity(s.getId()).build();		
-	}
-	
-	// GET a Server by Id
-	@GET
-	@Path("/server/{server_id}")
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response getServer(@PathParam("server_id") String server_id){	 
-		try {
-			Statement state = getStatement();
-			ResultSet resset = state.executeQuery("SELECT server_id, ip, port FROM server "
-					+ "WHERE server_id ='" + server_id + "';");
-			serverData server = new serverData();
-			
-			if(!resset.isBeforeFirst())
-				return Response.status(404).entity("server not found").build();
-			else{
-				resset.next();
-				server.setId(resset.getString("server_id"));
-				server.setIp(resset.getString("ip"));
-				server.setPort(resset.getString("port"));
-			}
-			state.close();
-			return Response.status(200).entity(server).build();
-			
-		} catch (SQLException e) {
-			return Response.status(500).entity("Database ERROR" + e.toString()).build();
-		}
-	}
-	
-	// DELETE a server by server_id
-	@DELETE
-	@Path("/server/{server_id}/delete")
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response deleteServer(@PathParam("server_id") String server_id){
-		try{
-			Statement st = getStatement();
-			st.executeUpdate("DELETE FROM server WHERE server_id = '" + server_id + "';");
-			st.close();
-			return Response.status(204).build();
-			
-		}catch(SQLException ex){
-			return Response.status(500).entity("Database ERROR").build();
-		}
-	}
+        } catch (Exception e) {
+            System.out.println("DB not loaded");
+            return null;
+        }
+    }
+
+    // POST a File
+    @POST
+    @Path("/file")
+    public Response postFile(fileData f) throws SQLException {
+        Statement st = getStatement();
+        String key = UUID.randomUUID().toString(); //WebService generates a random unique key for the file
+
+        try {
+            st.executeUpdate("INSERT INTO file(key, name, description, server_id) VALUES ("
+                    + "'" + key + "',"
+                    + "'" + f.getName() + "',"
+                    + "'" + f.getDescription() + "',"
+                    + "'" + f.getServerId() + "');");
+        } catch (Exception e) {
+            System.err.println(e.getMessage());
+        }
+
+        st.close();
+        return Response.status(201).entity(key).build();
+    }
+
+    // GET a File by name
+    @GET
+    @Path("/filen/{name}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getFileByName(@PathParam("name") String name) {
+        try {
+            Statement st = getStatement();
+            ResultSet rs = st.executeQuery("SELECT key, name, description, server_id FROM file "
+                    + "WHERE name LIKE'%" + name + "%';");
+            List<fileData> af = new ArrayList<>();
+            if (!rs.isBeforeFirst()) {
+                return Response.status(404).entity("File not found").build();
+            } else {
+                while (rs.next()) {
+                    fileData f = new fileData();
+                    f.setKey(rs.getString("key"));
+                    f.setName(rs.getString("name"));
+                    f.setDescription(rs.getString("description"));
+                    f.setServerId(rs.getString("server_id"));
+                    af.add(f);
+                }
+                rs.next();
+            }
+
+            st.close();
+            return Response.status(200).entity(af).build();
+
+        } catch (SQLException e) {
+            return Response.status(500).entity("Database ERROR" + e.toString()).build();
+        }
+    }
+
+    // GET a File by name and server
+    @GET
+    @Path("/filenas/{name}_{server_id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getFileByNameAndServer(@PathParam("name") String name, @PathParam("server_id") String server_id) {
+        try {
+            Statement st = getStatement();
+            ResultSet rs = st.executeQuery("SELECT key, name, description, server_id FROM file "
+                    + "WHERE name LIKE'%" + name + "%' AND server_id ='" + server_id + "';");
+            List<fileData> af = new ArrayList<>();
+            if (!rs.isBeforeFirst()) {
+                return Response.status(404).entity("File not found").build();
+            } else {
+                while (rs.next()) {
+                    fileData f = new fileData();
+                    f.setKey(rs.getString("key"));
+                    f.setName(rs.getString("name"));
+                    f.setDescription(rs.getString("description"));
+                    f.setServerId(rs.getString("server_id"));
+                    af.add(f);
+                }
+                rs.next();
+            }
+
+            st.close();
+            return Response.status(200).entity(af).build();
+
+        } catch (SQLException e) {
+            return Response.status(500).entity("Database ERROR" + e.toString()).build();
+        }
+    }
+
+    // GET a File by description
+    @GET
+    @Path("/filed/{description}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getFileByDescription(@PathParam("description") String description) {
+        try {
+            Statement st = getStatement();
+            ResultSet rs = st.executeQuery("SELECT key, name, description, server_id FROM file "
+                    + "WHERE description LIKE'%" + description + "%';");
+            List<fileData> af = new ArrayList<>();
+            if (!rs.isBeforeFirst()) {
+                return Response.status(404).entity("File not found").build();
+            } else {
+                while (rs.next()) {
+                    fileData f = new fileData();
+                    f.setKey(rs.getString("key"));
+                    f.setName(rs.getString("name"));
+                    f.setDescription(rs.getString("description"));
+                    f.setServerId(rs.getString("server_id"));
+                    af.add(f);
+                }
+                rs.next();
+            }
+
+            st.close();
+            return Response.status(200).entity(af).build();
+
+        } catch (SQLException e) {
+            return Response.status(500).entity("Database ERROR" + e.toString()).build();
+        }
+    }
+
+    // GET a File by description and server
+    @GET
+    @Path("/filedas/{description}_{server_id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getFileByDescriptionAndServer(@PathParam("description") String description, @PathParam("server_id") String server_id) {
+        try {
+            Statement st = getStatement();
+            ResultSet rs = st.executeQuery("SELECT key, name, description, server_id FROM file "
+                    + "WHERE description LIKE'%" + description + "%' AND server_id ='" + server_id + "';");
+            List<fileData> af = new ArrayList<>();
+            if (!rs.isBeforeFirst()) {
+                return Response.status(404).entity("File not found").build();
+            } else {
+                while (rs.next()) {
+                    fileData f = new fileData();
+                    f.setKey(rs.getString("key"));
+                    f.setName(rs.getString("name"));
+                    f.setDescription(rs.getString("description"));
+                    f.setServerId(rs.getString("server_id"));
+                    af.add(f);
+                }
+                rs.next();
+            }
+
+            st.close();
+            return Response.status(200).entity(af).build();
+
+        } catch (SQLException e) {
+            return Response.status(500).entity("Database ERROR" + e.toString()).build();
+        }
+    }
+
+    // GET a File by name and description
+    @GET
+    @Path("/filenad/{name}_{description}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getFileByNameAndDescription(@PathParam("name") String name, @PathParam("description") String description) {
+        try {
+            Statement st = getStatement();
+            ResultSet rs = st.executeQuery("SELECT key, name, description, server_id FROM file "
+                    + "WHERE name LIKE'%" + name + "%' AND description LIKE'%" + description + "%';");
+            List<fileData> af = new ArrayList<>();
+            if (!rs.isBeforeFirst()) {
+                return Response.status(404).entity("File not found").build();
+            } else {
+                while (rs.next()) {
+                    fileData f = new fileData();
+                    f.setKey(rs.getString("key"));
+                    f.setName(rs.getString("name"));
+                    f.setDescription(rs.getString("description"));
+                    f.setServerId(rs.getString("server_id"));
+                    af.add(f);
+                }
+                rs.next();
+            }
+
+            st.close();
+            return Response.status(200).entity(af).build();
+
+        } catch (SQLException e) {
+            return Response.status(500).entity("Database ERROR" + e.toString()).build();
+        }
+    }
+
+    // GET a File by name, description and server
+    @GET
+    @Path("/filendas/{name}_{description}_{server_id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getFileByNameDescriptionAndServer(@PathParam("name") String name, @PathParam("description") String description, @PathParam("server_id") String server_id) {
+        try {
+            Statement st = getStatement();
+            ResultSet rs = st.executeQuery("SELECT key, name, description, server_id FROM file "
+                    + "WHERE name LIKE'%" + name + "%' AND description LIKE'%" + description + "% AND server_id ='" + server_id + "';");
+            List<fileData> af = new ArrayList<>();
+            if (!rs.isBeforeFirst()) {
+                return Response.status(404).entity("File not found").build();
+            } else {
+                while (rs.next()) {
+                    fileData f = new fileData();
+                    f.setKey(rs.getString("key"));
+                    f.setName(rs.getString("name"));
+                    f.setDescription(rs.getString("description"));
+                    f.setServerId(rs.getString("server_id"));
+                    af.add(f);
+                }
+                rs.next();
+            }
+
+            st.close();
+            return Response.status(200).entity(af).build();
+
+        } catch (SQLException e) {
+            return Response.status(500).entity("Database ERROR" + e.toString()).build();
+        }
+    }
+
+    // GET a File by key
+    @GET
+    @Path("/filek/{key}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getFileByKey(@PathParam("key") String key) {
+        try {
+            Statement st = getStatement();
+            ResultSet rs = st.executeQuery("SELECT key, name, description, server_id FROM file "
+                    + "WHERE key ='" + key + "';");
+            fileData f = new fileData();
+            if (!rs.isBeforeFirst()) {
+                return Response.status(404).entity("File not found").build();
+            } else {
+                rs.next();
+                f.setKey(rs.getString("key"));
+                f.setName(rs.getString("name"));
+                f.setDescription(rs.getString("description"));
+                f.setServerId(rs.getString("server_id"));
+            }
+
+            st.close();
+            return Response.status(200).entity(f).build();
+
+        } catch (SQLException e) {
+            return Response.status(500).entity("Database ERROR" + e.toString()).build();
+        }
+    }
+
+    // GET a File by key server
+    @GET
+    @Path("/filekas/{key}_{server_id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getFileByKeyAndServer(@PathParam("key") String key, @PathParam("server_id") String server_id) {
+        try {
+            Statement st = getStatement();
+            ResultSet rs = st.executeQuery("SELECT key, name, description, server_id FROM file "
+                    + "WHERE key ='" + key + "' AND server_id ='" + server_id + "';");
+            fileData f = new fileData();
+            if (!rs.isBeforeFirst()) {
+                return Response.status(404).entity("File not found").build();
+            } else {
+                rs.next();
+                f.setKey(rs.getString("key"));
+                f.setName(rs.getString("name"));
+                f.setDescription(rs.getString("description"));
+                f.setServerId(rs.getString("server_id"));
+            }
+
+            st.close();
+            return Response.status(200).entity(f).build();
+
+        } catch (SQLException e) {
+            return Response.status(500).entity("Database ERROR" + e.toString()).build();
+        }
+    }
+
+    // DELETE a File by key
+    @DELETE
+    @Path("/file/{key}/delete")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response deleteFile(@PathParam("key") String key) {
+        try {
+            Statement st = getStatement();
+            st.executeUpdate("DELETE FROM file WHERE key = '" + key + "';");
+            st.close();
+            return Response.status(204).build();
+
+        } catch (SQLException ex) {
+            return Response.status(500).entity("Database ERROR").build();
+        }
+    }
+
+    // POST a Server
+    @POST
+    @Path("/server")
+    public Response postServer(serverData s) throws SQLException {
+        Statement st = getStatement();
+
+        try {
+            st.executeUpdate("INSERT INTO server(server_id, ip, port) VALUES ("
+                    + "'" + s.getId() + "',"
+                    + "'" + s.getIp() + "',"
+                    + "'" + s.getPort() + "');");
+
+        } catch (Exception e) {
+            System.err.println(e.getMessage());
+        }
+
+        st.close();
+        return Response.status(201).entity(s.getId()).build();
+    }
+
+    // GET a Server by Id
+    @GET
+    @Path("/server/{server_id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getServer(@PathParam("server_id") String server_id) {
+        try {
+            Statement state = getStatement();
+            ResultSet resset = state.executeQuery("SELECT server_id, ip, port FROM server "
+                    + "WHERE server_id ='" + server_id + "';");
+            serverData server = new serverData();
+
+            if (!resset.isBeforeFirst()) {
+                return Response.status(404).entity("server not found").build();
+            } else {
+                resset.next();
+                server.setId(resset.getString("server_id"));
+                server.setIp(resset.getString("ip"));
+                server.setPort(resset.getString("port"));
+            }
+            state.close();
+            return Response.status(200).entity(server).build();
+
+        } catch (SQLException e) {
+            return Response.status(500).entity("Database ERROR" + e.toString()).build();
+        }
+    }
+
+    // DELETE a server by server_id
+    @DELETE
+    @Path("/server/{server_id}/delete")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response deleteServer(@PathParam("server_id") String server_id) {
+        try {
+            Statement st = getStatement();
+            st.executeUpdate("DELETE FROM server WHERE server_id = '" + server_id + "';");
+            st.close();
+            return Response.status(204).build();
+
+        } catch (SQLException ex) {
+            return Response.status(500).entity("Database ERROR").build();
+        }
+    }
 }

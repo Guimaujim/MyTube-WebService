@@ -83,24 +83,28 @@ public class MyTubeImpl extends UnicastRemoteObject implements MyTubeInterface {
             }
         } else {
             af = getFileByName(name);
-            int num = c.chooseD(af);
-
-            if (num == -1) {
-                return new byte[0];
+            
+            if (af != null){
+	            int num = c.chooseD(af);
+	
+	            if (num == -1) {
+	                return new byte[0];
+	            }
+	
+	            serverData sd = getServer(af[num].getServerId());
+	
+	            try {
+	                String registryURL = "rmi://" + sd.getIp() + ":" + sd.getPort() + "/mytube/" + sd.getId();
+	                MyTubeInterface i = (MyTubeInterface) Naming.lookup(registryURL);
+	                return i.downloadKey(af[num].getKey(), c, sd.getId());
+	            } catch (MalformedURLException e) {
+	                e.printStackTrace();
+	            } catch (NotBoundException e) {
+	                e.printStackTrace();
+	            }
             }
-
-            serverData sd = getServer(af[num].getServerId());
-
-            try {
-                String registryURL = "rmi://" + sd.getIp() + ":" + sd.getPort() + "/mytube/" + sd.getId();
-                MyTubeInterface i = (MyTubeInterface) Naming.lookup(registryURL);
-                return i.downloadKey(af[num].getKey(), c, sd.getId());
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            } catch (NotBoundException e) {
-                e.printStackTrace();
-            }
-            return null;
+            
+            return new byte[0];
         }
     }
 
@@ -142,24 +146,26 @@ public class MyTubeImpl extends UnicastRemoteObject implements MyTubeInterface {
             }
         } else {
             af = getFileByDescription(description);
-            int num = c.chooseD(af);
-
-            if (num == -1) {
-                return new byte[0];
+            if (af != null){
+	            int num = c.chooseD(af);
+	
+	            if (num == -1) {
+	                return new byte[0];
+	            }
+	
+	            serverData sd = getServer(af[num].getServerId());
+	
+	            try {
+	                String registryURL = "rmi://" + sd.getIp() + ":" + sd.getPort() + "/mytube/" + sd.getId();
+	                MyTubeInterface i = (MyTubeInterface) Naming.lookup(registryURL);
+	                return i.downloadKey(af[num].getKey(), c, sd.getId());
+	            } catch (MalformedURLException e) {
+	                e.printStackTrace();
+	            } catch (NotBoundException e) {
+	                e.printStackTrace();
+	            }
             }
-
-            serverData sd = getServer(af[num].getServerId());
-
-            try {
-                String registryURL = "rmi://" + sd.getIp() + ":" + sd.getPort() + "/mytube/" + sd.getId();
-                MyTubeInterface i = (MyTubeInterface) Naming.lookup(registryURL);
-                return i.downloadKey(af[num].getKey(), c, sd.getId());
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            } catch (NotBoundException e) {
-                e.printStackTrace();
-            }
-            return null;
+            return new byte[0];
         }
     }
 
@@ -185,18 +191,20 @@ public class MyTubeImpl extends UnicastRemoteObject implements MyTubeInterface {
             }
         } else {
             af = getFileByKey(key);
-            serverData sd = getServer(af.getServerId());
-
-            try {
-                String registryURL = "rmi://" + sd.getIp() + ":" + sd.getPort() + "/mytube/" + sd.getId();
-                MyTubeInterface i = (MyTubeInterface) Naming.lookup(registryURL);
-                return i.downloadKey(key, c, sd.getId());
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            } catch (NotBoundException e) {
-                e.printStackTrace();
+            if (af != null){
+	            serverData sd = getServer(af.getServerId());
+	
+	            try {
+	                String registryURL = "rmi://" + sd.getIp() + ":" + sd.getPort() + "/mytube/" + sd.getId();
+	                MyTubeInterface i = (MyTubeInterface) Naming.lookup(registryURL);
+	                return i.downloadKey(key, c, sd.getId());
+	            } catch (MalformedURLException e) {
+	                e.printStackTrace();
+	            } catch (NotBoundException e) {
+	                e.printStackTrace();
+	            }
             }
-            return null;
+            return new byte[0];
         }
     }
 
@@ -238,24 +246,26 @@ public class MyTubeImpl extends UnicastRemoteObject implements MyTubeInterface {
             }
         } else {
             af = getFileByNameAndDescription(name, description);
-            int num = c.chooseD(af);
-
-            if (num == -1) {
-                return new byte[0];
+            if (af != null){
+	            int num = c.chooseD(af);
+	
+	            if (num == -1) {
+	                return new byte[0];
+	            }
+	
+	            serverData sd = getServer(af[num].getServerId());
+	
+	            try {
+	                String registryURL = "rmi://" + sd.getIp() + ":" + sd.getPort() + "/mytube/" + sd.getId();
+	                MyTubeInterface i = (MyTubeInterface) Naming.lookup(registryURL);
+	                return i.downloadKey(af[num].getKey(), c, sd.getId());
+	            } catch (MalformedURLException e) {
+	                e.printStackTrace();
+	            } catch (NotBoundException e) {
+	                e.printStackTrace();
+	            }
             }
-
-            serverData sd = getServer(af[num].getServerId());
-
-            try {
-                String registryURL = "rmi://" + sd.getIp() + ":" + sd.getPort() + "/mytube/" + sd.getId();
-                MyTubeInterface i = (MyTubeInterface) Naming.lookup(registryURL);
-                return i.downloadKey(af[num].getKey(), c, sd.getId());
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            } catch (NotBoundException e) {
-                e.printStackTrace();
-            }
-            return null;
+            return new byte[0];
         }
     }
     
@@ -398,7 +408,6 @@ public class MyTubeImpl extends UnicastRemoteObject implements MyTubeInterface {
             conn.setRequestMethod("GET");
             conn.setRequestProperty("Accept", MediaType.APPLICATION_JSON);
             if (conn.getResponseCode() != 200) {
-                System.out.println(conn.getResponseCode());
                 return null;
             }
             int i;
@@ -428,7 +437,6 @@ public class MyTubeImpl extends UnicastRemoteObject implements MyTubeInterface {
             conn.setRequestMethod("GET");
             conn.setRequestProperty("Accept", MediaType.APPLICATION_JSON);
             if (conn.getResponseCode() != 200) {
-                System.out.println(conn.getResponseCode());
                 return null;
             }
             int i;
@@ -458,7 +466,6 @@ public class MyTubeImpl extends UnicastRemoteObject implements MyTubeInterface {
             conn.setRequestMethod("GET");
             conn.setRequestProperty("Accept", MediaType.APPLICATION_JSON);
             if (conn.getResponseCode() != 200) {
-                System.out.println(conn.getResponseCode());
                 return null;
             }
             int i;
@@ -488,7 +495,6 @@ public class MyTubeImpl extends UnicastRemoteObject implements MyTubeInterface {
             conn.setRequestMethod("GET");
             conn.setRequestProperty("Accept", MediaType.APPLICATION_JSON);
             if (conn.getResponseCode() != 200) {
-                System.out.println(conn.getResponseCode());
                 return null;
             }
             int i;
@@ -518,7 +524,6 @@ public class MyTubeImpl extends UnicastRemoteObject implements MyTubeInterface {
             conn.setRequestMethod("GET");
             conn.setRequestProperty("Accept", MediaType.APPLICATION_JSON);
             if (conn.getResponseCode() != 200) {
-                System.out.println(conn.getResponseCode());
                 return null;
             }
             BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
@@ -545,7 +550,6 @@ public class MyTubeImpl extends UnicastRemoteObject implements MyTubeInterface {
             conn.setRequestMethod("GET");
             conn.setRequestProperty("Accept", MediaType.APPLICATION_JSON);
             if (conn.getResponseCode() != 200) {
-                System.out.println(conn.getResponseCode());
                 return null;
             }
             BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
@@ -572,7 +576,6 @@ public class MyTubeImpl extends UnicastRemoteObject implements MyTubeInterface {
             conn.setRequestMethod("GET");
             conn.setRequestProperty("Accept", MediaType.APPLICATION_JSON);
             if (conn.getResponseCode() != 200) {
-                System.out.println(conn.getResponseCode());
                 return null;
             }
             int i;
@@ -602,7 +605,6 @@ public class MyTubeImpl extends UnicastRemoteObject implements MyTubeInterface {
             conn.setRequestMethod("GET");
             conn.setRequestProperty("Accept", MediaType.APPLICATION_JSON);
             if (conn.getResponseCode() != 200) {
-                System.out.println(conn.getResponseCode());
                 return null;
             }
             int i;
@@ -646,7 +648,6 @@ public class MyTubeImpl extends UnicastRemoteObject implements MyTubeInterface {
             conn.setRequestMethod("GET");
             conn.setRequestProperty("Accept", MediaType.APPLICATION_JSON);
             if (conn.getResponseCode() != 200) {
-                System.out.println(conn.getResponseCode());
                 return null;
             }
             BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
