@@ -10,7 +10,7 @@ import classData.fileData;
 //Interface of the server's implementation
 public interface MyTubeInterface extends Remote {
 
-    public byte[] download(String name, CallbackInterface c)
+    public byte[] download(String name, CallbackInterface c, String server_id)
             throws java.rmi.RemoteException;
 
     public String upload(byte[] file, String title, String server_id, String description)

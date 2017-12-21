@@ -44,7 +44,7 @@ public class MyTubeClient {
                 //Client waits for user's to decide what to do
 
                 if ("do".equals(input) || "download".equals(input)) {
-                    clientDownload(i, callbackObj);
+                    clientDownload(i, callbackObj, server_id);
                     System.out.println("Download completed!");
                 } else if ("u".equals(input) || "upload".equals(input)) {
                     clientUpload(i, server_id);
@@ -69,14 +69,14 @@ public class MyTubeClient {
     }
 
 //Downloads file from server to client
-    public static void clientDownload(MyTubeInterface i, CallbackInterface c) throws RemoteException {
+    public static void clientDownload(MyTubeInterface i, CallbackInterface c, String server_id) throws RemoteException {
         String name;
         Scanner reader = new Scanner(System.in);
 
         System.out.println("Please insert the name of the file you want to download:");
         name = reader.nextLine();
         String path = "ClientMem/" + name;
-        byte[] file = i.download(name, c); //Client calls server to execute implementation's method to download the file
+        byte[] file = i.download(name, c, server_id); //Client calls server to execute implementation's method to download the file
 
         if (file.length == 0) {
             System.out.println("There isn't any file named like that");

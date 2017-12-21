@@ -47,28 +47,42 @@ public class MyTubeImpl extends UnicastRemoteObject implements MyTubeInterface {
 
     //Sends file to client
     @Override
-    public byte[] download(String name, CallbackInterface c) throws RemoteException {
-        File folder = new File("Database");
-        String path = "Database";
-        File[] directory = folder.listFiles();
-        File userFile;
-        path = search(directory, path, name); //Server searches for the file
+    public byte[] download(String name, CallbackInterface c, String server_id) throws RemoteException {  	
+    	fileData[] af = getFileByNameAndServer(name, server_id);
 
-        if (path != null) {
-            userFile = new File(path);
-            byte buffer[] = new byte[(int) userFile.length()]; //Server converts file into an array of bytes to be sent
-
-            try {
-                BufferedInputStream input = new BufferedInputStream(new FileInputStream(path));
-                input.read(buffer, 0, buffer.length);
-                input.close();
-                return (buffer); //Server sends the array of bytes
-            } catch (IOException e) {
-                System.out.println("Error!");
-                return new byte[0];
-            }
+        if (af != null) {
+        	if(af.length > 1){
+        		int j = c.chooseD(af);
+	            String path = "Database/" + af[j].getKey() + "/" + name;
+	            File userFile;
+	            userFile = new File(path);
+	            byte buffer[] = new byte[(int) userFile.length()]; //Server converts file into an array of bytes to be sent
+	            try {
+	                BufferedInputStream input = new BufferedInputStream(new FileInputStream(path));
+	                input.read(buffer, 0, buffer.length);
+	                input.close();
+	                return (buffer); //Server sends the array of bytes
+	            } catch (IOException e) {
+	                System.out.println("Error!");
+	                return new byte[0];
+	            }
+        	}else{
+	            String path = "Database/" + af[0].getKey() + "/" + name;
+	            File userFile;
+	            userFile = new File(path);
+	            byte buffer[] = new byte[(int) userFile.length()]; //Server converts file into an array of bytes to be sent
+	            try {
+	                BufferedInputStream input = new BufferedInputStream(new FileInputStream(path));
+	                input.read(buffer, 0, buffer.length);
+	                input.close();
+	                return (buffer); //Server sends the array of bytes
+	            } catch (IOException e) {
+	                System.out.println("Error!");
+	                return new byte[0];
+	            }
+        	}
         } else {
-			fileData[] af = getFileByName(name);
+			af = getFileByName(name);
 			int num = c.chooseD(af);
 			
 			if(num == -1){
@@ -80,7 +94,7 @@ public class MyTubeImpl extends UnicastRemoteObject implements MyTubeInterface {
             try {
                 String registryURL = "rmi://" + sd.getIp() + ":" + sd.getPort() + "/mytube/" + sd.getId();
 				MyTubeInterface i = (MyTubeInterface) Naming.lookup(registryURL);
-				return i.download(name, c);
+				return i.download(name, c, sd.getId());
 			} catch (MalformedURLException e) {
 				e.printStackTrace();
 			} catch (NotBoundException e) {
@@ -258,6 +272,36 @@ public class MyTubeImpl extends UnicastRemoteObject implements MyTubeInterface {
     public fileData[] getFileByName(String name){
     	try {
 			URL url = new URL ("http://localhost:8080/MyTubeRESTwsWeb/rest/filen/" + name);
+			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+			conn.setRequestMethod("GET");
+			conn.setRequestProperty("Accept", MediaType.APPLICATION_JSON);
+			if(conn.getResponseCode() != 200){
+				System.out.println(conn.getResponseCode());
+				return null;
+			}
+			int i;
+			BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+			String output = br.readLine();
+			conn.disconnect();
+			
+			Gson g = new Gson();
+			fileData[] af = g.fromJson(output, fileData[].class);
+			for(i=0;i<af.length;i++){
+				af[i].setKey(af[i].getKey().trim());
+				af[i].setName(af[i].getName().trim());
+				af[i].setDescription(af[i].getDescription().trim());
+				af[i].setServerId(af[i].getServerId().trim());
+			}
+			return af;		
+		} catch (Exception e) { 
+			System.out.println(e);
+			return null;
+		}
+    }
+    
+    public fileData[] getFileByNameAndServer(String name, String server_id){
+    	try {
+			URL url = new URL ("http://localhost:8080/MyTubeRESTwsWeb/rest/filenas/" + name + "_" + server_id);
 			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 			conn.setRequestMethod("GET");
 			conn.setRequestProperty("Accept", MediaType.APPLICATION_JSON);
